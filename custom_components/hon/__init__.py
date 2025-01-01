@@ -55,7 +55,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         """Fetch data from API."""
         try:
             for appliance in hon.appliances:
-                await appliance.update()
+                try:
+                    await appliance.update()
+                except AttributeError as exc:
+                    _LOGGER.warning(
+                        "Failed to update appliance: %s",
+                        appliance.nick_name,
+                        exc,
+                    )
             return {"last_update": hon.api.auth.refresh_token}
         except Exception as exc:
             _LOGGER.error("Error updating Hon data: %s", exc)
