@@ -58,9 +58,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 try:
                     await appliance.update()
                 except AttributeError as exc:
-                    _LOGGER.warning(
-                        "Failed to update appliance %s: %s",
-                        appliance.name,
+                    _LOGGER.warning("Failed to update appliance: %s",
+                        appliance.nick_name,
                         exc,
                     )
             return {"last_update": hon.api.auth.refresh_token}
