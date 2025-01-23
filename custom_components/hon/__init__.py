@@ -11,6 +11,7 @@ from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.helpers import config_validation as cv, aiohttp_client
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.core import HomeAssistant
 from pyhon import Hon
 
 from .const import DOMAIN, PLATFORMS, MOBILE_ID, CONF_REFRESH_TOKEN
@@ -31,7 +32,10 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+<<<<<<< .merge_file_GYGNbd
     """Set up Hon from a config entry."""
+=======
+>>>>>>> .merge_file_5OKNZi
     session = aiohttp_client.async_get_clientsession(hass)
 
     try:
@@ -106,6 +110,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry, data={**entry.data, CONF_REFRESH_TOKEN: hon.api.auth.refresh_token}
     )
 
+<<<<<<< .merge_file_GYGNbd
+=======
+    coordinator: DataUpdateCoordinator[dict[str, Any]] = DataUpdateCoordinator(
+        hass, _LOGGER, name=DOMAIN
+    )
+    hon.subscribe_updates(lambda data: hass.add_job(coordinator.async_set_updated_data, data))
+
+>>>>>>> .merge_file_5OKNZi
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.unique_id] = {"hon": hon, "coordinator": coordinator}
 
@@ -114,9 +126,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+<<<<<<< .merge_file_GYGNbd
     """Unload a config entry."""
     try:
         hon = hass.data[DOMAIN][entry.unique_id]["hon"]
+=======
+    refresh_token = hass.data[DOMAIN][entry.unique_id]["hon"].api.auth.refresh_token
+>>>>>>> .merge_file_5OKNZi
 
         # Store refresh token
         refresh_token = hon.api.auth.refresh_token
