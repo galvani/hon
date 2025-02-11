@@ -126,7 +126,7 @@ class HonDataArchive(HonEntity, ButtonEntity):
         title = f"{self._device.nick_name} Data Archive"
         text = (
             f'<a href="/local/{data}" target="_blank">{data}</a> <br/><br/> '
-            f"Use this data for [GitHub Issues of Haier hOn](https://github.com/Andre0512/hon).<br/>"
+            f"Use this data for [GitHub Issues of Haier hOn](https://github.com/paroque28/hon).<br/>"
             f"Or add it to the [hon-test-data collection](https://github.com/Andre0512/hon-test-data)."
         )
         persistent_notification.create(self._hass, text, title)
