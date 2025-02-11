@@ -2,6 +2,7 @@ import logging
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
+import asyncio
 
 import voluptuous as vol  # type: ignore[import-untyped]
 
@@ -15,6 +16,7 @@ from homeassistant.core import HomeAssistant
 from pyhon import Hon
 
 from .const import DOMAIN, PLATFORMS, MOBILE_ID, CONF_REFRESH_TOKEN
+from .ssl import update_ca_certificates
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,7 +49,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 test_data_path=Path(hass.config.config_dir),
                 refresh_token=entry.data.get(CONF_REFRESH_TOKEN, ""),
             )
-
+        updated = await update_ca_certificates(hass)
+        if updated:
+            _LOGGER.error("Certificate loaded into Certifi CA bundle. Restart Home Assistant to apply changes.")
+            raise Exception("Certificate loaded into Certifi CA bundle. Restart Home Assistant to apply changes.")
         # Create Hon instance in executor
         hon = await hass.async_add_executor_job(init_hon)
         # Create and initialize
