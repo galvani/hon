@@ -8,10 +8,10 @@ import certifi
 from typing import Optional
 
 try:
-    from homeassistant.core import HomeAssistant as HA
+    from homeassistant.core import HomeAssistant
 except ImportError:
     print("Home Assistant not found. Running standalone.")
-    HA = None
+    HomeAssistant = None
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,13 +43,16 @@ def get_ssl_certificate(hostname: str = "account2.hon-smarthome.com", port: int 
 
     print(f"Certificate saved to {output_file}")
 
-async def update_ca_certificates(hass: Optional[HA]) -> bool:
+async def update_ca_certificates(hass: Optional[HomeAssistant]) -> bool:
     """
     Update the CA certificates in the Certifi bundle by appending a custom certificate.
 
     If the custom certificate file (RapidSSL_TLS_RSA_CA_G1.crt) is missing,
     it falls back to retrieving it using `get_ssl_certificate`.
     """
+    if hass is None:
+        raise ValueError("Home Assistant instance is required")
+
     # Determine paths for the Certifi bundle and its backup.
     certifi_bundle_path = Path(certifi.where())
     _LOGGER.debug(f"Certifi CA bundle path: {certifi_bundle_path}")
