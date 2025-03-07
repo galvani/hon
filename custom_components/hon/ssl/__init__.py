@@ -11,7 +11,7 @@ try:
     from homeassistant.core import HomeAssistant
 except ImportError:
     print("Home Assistant not found. Running standalone.")
-    HomeAssistantType = None  # Use a different variable name to avoid confusion
+    HomeAssistantType: Optional[type] = None  # Add type annotation
 
 _LOGGER = logging.getLogger(__name__)
 
