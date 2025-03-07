@@ -5,6 +5,8 @@ import logging
 from pathlib import Path
 import shutil
 import certifi
+from typing import Optional
+
 try:
     from homeassistant.core import HomeAssistant as HA
 except ImportError:
@@ -29,7 +31,7 @@ def get_ssl_certificate(hostname: str = "account2.hon-smarthome.com", port: int 
     with socket.create_connection((hostname, port)) as sock:
         with context.wrap_socket(sock, server_hostname=hostname) as ssock:
             # Retrieve the certificate in binary (DER) form.
-            der_cert = ssock.getpeercert(binary_form=True)
+            der_cert: Optional[bytes] = ssock.getpeercert(binary_form=True)
             if der_cert is None:
                 raise ValueError("Failed to retrieve certificate")
             # Convert it to PEM format.
@@ -41,7 +43,7 @@ def get_ssl_certificate(hostname: str = "account2.hon-smarthome.com", port: int 
 
     print(f"Certificate saved to {output_file}")
 
-async def update_ca_certificates(hass: HA) -> bool:
+async def update_ca_certificates(hass: Optional[HA]) -> bool:
     """
     Update the CA certificates in the Certifi bundle by appending a custom certificate.
 
