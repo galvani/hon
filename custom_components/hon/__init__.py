@@ -47,8 +47,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         updated = await update_ca_certificates(hass)
         if updated:
-            _LOGGER.error("Certificate loaded into Certifi CA bundle. Restart Home Assistant to apply changes.")
-            raise Exception("Certificate loaded into Certifi CA bundle. Restart Home Assistant to apply changes.")
+            _LOGGER.error(
+                "Certificate loaded into Certifi CA bundle. Restart Home Assistant to apply changes."
+            )
+            raise Exception(
+                "Certificate loaded into Certifi CA bundle. Restart Home Assistant to apply changes."
+            )
 
         # Initialize Hon in executor
         hon = await hon.create()

@@ -15,7 +15,12 @@ except ImportError:
 
 _LOGGER = logging.getLogger(__name__)
 
-def get_ssl_certificate(hostname: str = "account2.hon-smarthome.com", port: int = 443, output_file: str = "hon-smarthome.crt") -> None:
+
+def get_ssl_certificate(
+    hostname: str = "account2.hon-smarthome.com",
+    port: int = 443,
+    output_file: str = "hon-smarthome.crt",
+) -> None:
     """
     Retrieve an SSL certificate from a given hostname and save it in PEM format.
 
@@ -43,6 +48,7 @@ def get_ssl_certificate(hostname: str = "account2.hon-smarthome.com", port: int 
 
     print(f"Certificate saved to {output_file}")
 
+
 async def update_ca_certificates(hass: Optional[HomeAssistant]) -> bool:
     """
     Update the CA certificates in the Certifi bundle by appending a custom certificate.
@@ -56,7 +62,9 @@ async def update_ca_certificates(hass: Optional[HomeAssistant]) -> bool:
     # Determine paths for the Certifi bundle and its backup.
     certifi_bundle_path = Path(certifi.where())
     _LOGGER.debug(f"Certifi CA bundle path: {certifi_bundle_path}")
-    certifi_backup_path = certifi_bundle_path.with_suffix(certifi_bundle_path.suffix + ".bak")
+    certifi_backup_path = certifi_bundle_path.with_suffix(
+        certifi_bundle_path.suffix + ".bak"
+    )
 
     # Determine the location of the custom certificate file.
     rapidssl_ca_path = Path(__file__).with_name("RapidSSL_TLS_RSA_CA_G1.crt")
@@ -64,7 +72,9 @@ async def update_ca_certificates(hass: Optional[HomeAssistant]) -> bool:
 
     # Backup Certifi bundle.
     # Create a backup of the current Certifi bundle.
-    await hass.async_add_executor_job(shutil.copyfile, certifi_bundle_path, certifi_backup_path)
+    await hass.async_add_executor_job(
+        shutil.copyfile, certifi_bundle_path, certifi_backup_path
+    )
 
     # If the custom certificate file is missing, fall back to retrieving it.
     if not rapidssl_ca_path.exists():
@@ -76,12 +86,15 @@ async def update_ca_certificates(hass: Optional[HomeAssistant]) -> bool:
             get_ssl_certificate,
             "account2.hon-smarthome.com",
             443,
-            str(rapidssl_ca_path)
+            str(rapidssl_ca_path),
         )
 
     # Read the contents of the Certifi bundle and the custom certificate.
     cacerts, rapidssl_ca = await asyncio.gather(
-        *(hass.async_add_executor_job(path.read_text) for path in (certifi_bundle_path, rapidssl_ca_path))
+        *(
+            hass.async_add_executor_job(path.read_text)
+            for path in (certifi_bundle_path, rapidssl_ca_path)
+        )
     )
 
     # If the custom certificate is not already in the bundle, append it.
@@ -95,6 +108,7 @@ async def update_ca_certificates(hass: Optional[HomeAssistant]) -> bool:
         return True
 
     return False
+
 
 if __name__ == "__main__":
     get_ssl_certificate()
