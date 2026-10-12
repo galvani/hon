@@ -270,7 +270,7 @@ class HonWasherCard extends HTMLElement {
     const enabled = s.active ? this._usable(s.e.pause) : s.controllable;
     const status = this._usable(s.e.status) ? this._format(s.e.status) : this._t("idle");
     const line = s.hasTime
-      ? `${status}, ${this._t("ends").toLowerCase()} ${s.ends}`
+      ? `${this._t("ends")} ${s.ends}`
       : s.active || s.recent.length ? status : `${status}, ${s.programLabel}`;
     return `<ha-card class="compact ${s.running ? "running" : ""}">
       <div class="row">
