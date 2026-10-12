@@ -135,4 +135,4 @@ Run the checks, credit their release in the merge commit, and add a `JOURNAL.md`
 
 ## Releasing
 
-HACS installs from GitHub **releases**, not from `main`: `release.yml` zips `custom_components/hon` into `haier_hon.zip` when a release is published. Pushing to `main` reaches nobody until a release is published. Bump `manifest.json` `version`, then tag `v<version>` and publish the release.
+HACS installs from GitHub **releases**, not from `main`: `release.yml` zips `custom_components/hon` into `haier_hon.zip` when a release is published. Pushing to `main` reaches nobody until a release is published. Bump `manifest.json` `version`, add a section to `CHANGELOG.md`, then tag `v<version>` and publish the release with that section as its body — HACS shows it to users before they update. Write it for people running the integration: what they get, what they must do before updating, what changed for them; no internals.
