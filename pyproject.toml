@@ -1,0 +1,68 @@
+[project]
+name = "hon"
+version = "0.0.0"
+description = "Haier hOn Home Assistant custom integration"
+requires-python = ">=3.14.2"
+dependencies = ["pyhon-revived==0.19.2"]
+
+[dependency-groups]
+dev = [
+    "pytest-homeassistant-custom-component==0.13.372",
+    "mypy",
+    "ruff",
+    "black",
+    "pre-commit",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.black]
+extend-exclude = "tests/fixtures"
+
+[tool.ruff]
+extend-exclude = ["tests/fixtures"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B"]
+ignore = ["E721", "B034"]
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+disable_error_code = ["annotation-unchecked"]
+enable_error_code = ["ignore-without-code", "redundant-self", "truthy-iterable"]
+follow_imports = "silent"
+local_partial_types = true
+no_implicit_optional = true
+no_implicit_reexport = true
+show_error_codes = true
+strict_concatenate = false
+strict_equality = true
+warn_incomplete_stub = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = "homeassistant.*"
+implicit_reexport = true
+
+[[tool.mypy.overrides]]
+module = "custom_components.hon.config_flow"
+disable_error_code = ["arg-type", "override", "return-value"]
+warn_unused_ignores = false
+
+[[tool.mypy.overrides]]
+module = "custom_components.hon"
+warn_unused_ignores = false

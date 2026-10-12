@@ -1,6 +1,10 @@
 {
   "domain": "hon",
   "name": "Haier hOn",
+  "after_dependencies": [
+    "frontend",
+    "http"
+  ],
   "codeowners": [
     "@galvani",
     "@mmalolepszy",

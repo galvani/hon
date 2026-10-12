@@ -14,6 +14,7 @@ from homeassistant.core import HomeAssistant
 from . import const
 from .const import DOMAIN
 from .entity import HonEntity
+from .favourite import favourite_entities
 from .util import unique_entities, get_readable
 
 _LOGGER = logging.getLogger(__name__)
@@ -227,6 +228,11 @@ async def async_setup_entry(
                 continue
             entities.append(entity)
     async_add_entities(entities)
+    async_add_entities(
+        favourite_entities(
+            hass, entry, hass.data[DOMAIN][entry.unique_id]["hon"].appliances
+        )
+    )
 
 
 class HonConfigSelectEntity(HonEntity, SelectEntity):

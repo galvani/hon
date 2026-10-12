@@ -13,7 +13,7 @@ Maintained by [galvani](https://github.com/galvani). Built on [hOn Revived](http
 ---
 
 ## Installation
-**Method 1:** 
+**Method 1:**
 1. Add https://github.com/galvani/hon with the category "integration" as a custom repository in HACS
 2. Install it in HACS
 3. Restart Home Assistant
@@ -26,9 +26,20 @@ Maintained by [galvani](https://github.com/galvani). Built on [hOn Revived](http
 
 **Method 1**: [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=hon)
 
-**Method 2**: Settings > Devices & Services > Add Integration > **Haier hOn**  
+**Method 2**: Settings > Devices & Services > Add Integration > **Haier hOn**
 
 _If the integration is not in the list, you need to clear the browser cache._
+
+## Washing machine card
+
+The integration ships a dashboard card for washing machines, washer-dryers and tumble dryers. It shows the time left and the wash stage, lets you pick a program or one of the favourites you saved in the hOn app, set temperature and spin, and start, pause or stop the machine.
+
+```yaml
+type: custom:hon-washer-card
+device_id: <your appliance's device id>
+```
+
+Add it from the dashboard's card picker ("hOn washing machine"); it fills in the first hOn washer it finds. Starting from Home Assistant needs remote control enabled on the machine itself.
 
 ## Supported Appliances
 _Click to expand..._
@@ -768,7 +779,7 @@ Translation of internal names like programs are available for all languages whic
 * 🇺🇦 Ukrainian
 
 ## Compatibility
-Haier offers different apps for different markets. Some appliances are compatible with more than one app. This integration only supports appliances that can be controlled via hOn. Please download the hOn app and check compatibility before you open an issue. 
+Haier offers different apps for different markets. Some appliances are compatible with more than one app. This integration only supports appliances that can be controlled via hOn. Please download the hOn app and check compatibility before you open an issue.
 The apps on this (incomplete) list have been requested so far:
 
 | App             | Main Market   | Supported                               | Alternative                                                                     |
@@ -778,12 +789,14 @@ The apps on this (incomplete) list have been requested so far:
 | Hoover Wizard   | Europe        | :grey_question: (only newer appliances) |                                                                                 |
 | Haier Uhome     | China         | :x:                                     | [banto6/haier](https://github.com/banto6/haier)                                 |
 | Haier U+        | China         | :x:                                     |                                                                                 |
-| GE SmartHQ      | North America | :x:                                     | [simbaja/ha_gehome](https://github.com/simbaja/ha_gehome)                       |   
+| GE SmartHQ      | North America | :x:                                     | [simbaja/ha_gehome](https://github.com/simbaja/ha_gehome)                       |
 | Haier Evo       | Russia        | :x:                                     |                                                                                 |
 
 ## Contribute
-Want to help us to support more appliances? Or add more sensors? Or help with translating? Or beautify some icons or captions? 
+Want to help us to support more appliances? Or add more sensors? Or help with translating? Or beautify some icons or captions?
 Check out the [project on GitHub](https://github.com/galvani/hon), every contribution is welcome!
+
+Start with [AGENTS.md](AGENTS.md): how the integration is built, the coding standards, recipes for adding entities and appliances, and the checks to run. It is written for people and coding agents alike.
 
 | Please add your appliances data to our [hon-test-data collection](https://github.com/mmalolepszy/hon-test-data). <br/>This helps us to develop new features and not to break compatibility in newer versions. |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

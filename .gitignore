@@ -2,3 +2,7 @@ __pycache__/
 .idea/
 scripts/translations/
 scripts/test*
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/

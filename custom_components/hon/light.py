@@ -87,6 +87,7 @@ class HonLightEntity(HonEntity, LightEntity):
             self._attr_supported_color_modes.add(ColorMode.ONOFF)
         else:
             self._attr_supported_color_modes.add(ColorMode.BRIGHTNESS)
+        self._attr_color_mode = next(iter(self._attr_supported_color_modes))
         self._command, self._parameter = description.key.split(".")
         super().__init__(hass, entry, device, description)
         self._handle_coordinator_update(update=False)

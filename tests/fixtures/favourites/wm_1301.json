@@ -1,0 +1,16 @@
+[
+  {
+    "favouriteName": "Kids",
+    "command": {
+      "commandName": "startProgram",
+      "programName": "PROGRAMS.WM_WD.COTTONS"
+    }
+  },
+  {
+    "favouriteName": "Bed linen 60",
+    "command": {
+      "commandName": "startProgram",
+      "programName": "PROGRAMS.WM_WD.SYNTHETIC_AND_COLOURED"
+    }
+  }
+]

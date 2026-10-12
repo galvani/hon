@@ -1816,6 +1816,9 @@
                     "position_5": "Pevný - Poloha 5",
                     "swing": "Pohyb lamel"
                 }
+            },
+            "favourite_program": {
+                "name": "Oblíbený program"
             }
         },
         "switch": {

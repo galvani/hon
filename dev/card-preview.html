@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hOn card preview</title>
+<style>
+  body { margin: 0; padding: 24px 16px; font-family: Roboto, system-ui, sans-serif; background: #e9ecf1; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; max-width: 1400px; margin: 0 auto; }
+  .theme { padding: 16px; border-radius: 20px; }
+  .theme h1 { margin: 0 0 12px; font: 500 0.9rem/1.2 inherit; color: inherit; opacity: 0.7; }
+  .light { background: #f1f3f6; color: #1b1f24; --card-background-color: #fff; --primary-text-color: #1b1f24; --secondary-text-color: #69707a; --secondary-background-color: #eef1f5; --primary-color: #0a6cff; }
+  .dark { background: #1c1c1e; color: #e8e8ea; --card-background-color: #2a2a2d; --primary-text-color: #ececef; --secondary-text-color: #9a9aa2; --secondary-background-color: #37373b; --primary-color: #3b8cff; --divider-color: rgba(255,255,255,0.12); }
+  ha-card { display: block; background: var(--card-background-color); border-radius: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+</style>
+</head>
+<body>
+<div class="grid">
+  <section class="theme dark"><h1>Running (Czech, dark)</h1><div id="running"></div></section>
+  <section class="theme light"><h1>Ready with favourites (English, light)</h1><div id="idle"></div></section>
+  <section class="theme light"><h1>Remote control off on the machine</h1><div id="remote"></div></section>
+</div>
+<script>
+  customElements.define("ha-card", class extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: "open" }).innerHTML =
+        "<style>:host{display:block;background:var(--card-background-color);border-radius:22px;box-shadow:0 1px 3px rgba(0,0,0,.14)}</style><slot></slot>";
+    }
+  });
+</script>
+<script type="module">
+  import "../custom_components/hon/www/hon-washer-card.js";
+
+  const CZECH = {
+    "sensor.washer_status": { running: "Běží", ready: "Připraveno", pause: "Pozastaveno" },
+    "sensor.washer_phase": { washing: "Praní", rinse: "Máchání", spin: "Ždímání" },
+  };
+  const LABELS = {
+    "sensor.washer_status": { running: "Running", ready: "Ready", pause: "Paused" },
+    "sensor.washer_phase": { washing: "Washing", rinse: "Rinsing", spin: "Spinning" },
+    "select.washer_program": { eco_40_60_new_energy_label: "Eco 40-60", cottons: "Cottons", synthetic_and_coloured: "Synthetics & Coloured", mix: "Mixed", quick_14: "Quick 14'", wool: "Wool", baby: "Baby care" },
+    "sensor.washer_running_program": { eco_40_60_new_energy_label: "Eco 40-60" },
+    "select.washer_spin": { "0": "No spin" },
+    "select.washer_temperature": { "0": "Cold" },
+  };
+  const UNITS = { "select.washer_temperature": " °C", "select.washer_spin": " rpm" };
+
+  function makeHass({ language, status, phase, remaining, program, start = "off", pause = "off", lock = "off" }) {
+    const states = {};
+    const entities = {};
+    const add = (entity_id, translation_key, state, attributes = {}) => {
+      states[entity_id] = { entity_id, state, attributes };
+      entities[entity_id] = { entity_id, device_id: "washer", platform: "hon", translation_key };
+    };
+    add("sensor.washer_status", "washing_modes", status);
+    add("sensor.washer_phase", "program_phases_wm", phase);
+    add("sensor.washer_remaining", "remaining_time", String(remaining));
+    add("sensor.washer_running_program", "programs_wm", "eco_40_60_new_energy_label");
+    add("select.washer_program", "programs_wm", program, {
+      options: ["Barevné ložní prádlo", "Dětské", "Vše v jednom 59'", "baby", "cottons", "eco_40_60_new_energy_label", "iot_checkup", "mix", "quick_14", "synthetic_and_coloured", "wool"],
+    });
+    add("select.washer_favourite", "favourite_program", ["Barevné ložní prádlo", "Dětské", "Vše v jednom 59'"].includes(program) ? program : "unknown", {
+      options: ["Barevné ložní prádlo", "Dětské", "Vše v jednom 59'"],
+    });
+    add("select.washer_temperature", "temperature", "40", { options: ["0", "20", "30", "40", "60"] });
+    add("select.washer_spin", "spin_speed", "1000", { options: ["0", "400", "800", "1000", "1400"] });
+    add("switch.washer_start", "washing_machine", start);
+    add("switch.washer_pause", "pause", pause);
+    add("binary_sensor.washer_door_lock", "door_lock", lock);
+    return {
+      states, entities,
+      devices: { washer: { name: "Pračka" } },
+      locale: { language },
+      formatEntityState: (stateObj, value) => {
+        const v = value ?? stateObj.state;
+        const labels = { ...(LABELS[stateObj.entity_id] || {}), ...(language === "cs" ? CZECH[stateObj.entity_id] : {}) };
+        return labels[v] ?? `${v}${UNITS[stateObj.entity_id] || ""}`;
+      },
+      callService: (...args) => console.log("callService", ...args),
+    };
+  }
+
+  const mount = (id, hass) => {
+    const card = document.createElement("hon-washer-card");
+    card.setConfig({ device_id: "washer" });
+    card.hass = hass;
+    document.getElementById(id).append(card);
+  };
+  mount("running", makeHass({ language: "cs", status: "running", phase: "washing", remaining: 86, program: "Vše v jednom 59'", start: "on", lock: "on" }));
+  mount("idle", makeHass({ language: "en", status: "ready", phase: "ready", remaining: 0, program: "Dětské" }));
+  mount("remote", makeHass({ language: "en", status: "ready", phase: "ready", remaining: 0, program: "cottons", start: "unavailable", pause: "unavailable" }));
+</script>
+</body>
+</html>
