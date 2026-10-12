@@ -816,4 +816,11 @@ Start with [AGENTS.md](AGENTS.md): how the integration is built, the coding stan
 * [mmalolepszy](https://github.com/mmalolepszy) and the contributors of [hOn Revived](https://github.com/mmalolepszy/hon-revived) and [pyhon-revived](https://github.com/mmalolepszy/pyhOn) kept both alive; most of the current code is theirs. Support them on [Buy Me a Coffee](https://www.buymeacoffee.com/mmalolepszy).
 * [paroque28](https://github.com/paroque28) contributed the TLS fix used by earlier releases of this fork.
 
+## Support
+If this integration saves you a trip to the hOn app, you can buy a coffee for the people who keep it going:
+
+| This fork — [galvani](https://github.com/galvani) | hOn Revived — [mmalolepszy](https://github.com/mmalolepszy) |
+| --- | --- |
+| [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/galvani78r) | [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/mmalolepszy) |
+
 Don't forget to star the repository if you found it useful! ⭐
