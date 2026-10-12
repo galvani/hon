@@ -199,9 +199,10 @@ class HonWasherCard extends HTMLElement {
   }
 
   _recentChips(s) {
-    if (!s.recent.length || s.active) return "";
+    if (!s.recent.length) return "";
+    const current = s.active ? s.e.runningProgram?.state : s.e.program?.state;
     return `<div class="recent" role="group" aria-label="${escape(this._t("recent"))}">
-      ${s.recent.map((o) => `<button class="pick" aria-pressed="${o === s.e.program?.state}" data-select="${escape(s.e.program.entity_id)}" data-option="${escape(o)}">${svgIcon(ICONS.history, 16)}<span>${escape(this._format(s.e.program, o))}</span></button>`).join("")}
+      ${s.recent.map((o) => `<button class="pick" aria-pressed="${o === current}" data-select="${escape(s.e.program.entity_id)}" data-option="${escape(o)}" ${s.active ? "disabled" : ""}>${svgIcon(ICONS.history, 16)}<span>${escape(this._format(s.e.program, o))}</span></button>`).join("")}
     </div>`;
   }
 
@@ -255,9 +256,9 @@ class HonWasherCard extends HTMLElement {
         ${svgIcon(ICONS.chevron, 18)}
       </label>
       ${this._recentChips(s)}
-      ${this._config.show_favourites && s.favourites.length && !s.active ? `
+      ${this._config.show_favourites && s.favourites.length ? `
         <div class="favourites" aria-label="${escape(this._t("favourites"))}">
-          ${s.favourites.map((o) => `<button class="fav" aria-pressed="${o === e.program?.state}" data-select="${escape(e.favourite.entity_id)}" data-option="${escape(o)}">${svgIcon(ICONS.star, 14)}${escape(o)}</button>`).join("")}
+          ${s.favourites.map((o) => `<button class="fav" aria-pressed="${o === e.program?.state}" data-select="${escape(e.favourite.entity_id)}" data-option="${escape(o)}" ${s.active ? "disabled" : ""}>${svgIcon(ICONS.star, 14)}${escape(o)}</button>`).join("")}
         </div>` : ""}
       ${!s.active ? `<div class="settings">${this._chips(e.temperature, this._t("temperature"))}${this._chips(e.spin, this._t("spinSpeed"))}${this._chips(e.dryLevel, this._t("dry"))}</div>` : ""}
       <div class="actions">${this._actions(s)}</div>
@@ -286,7 +287,8 @@ class HonWasherCard extends HTMLElement {
           ${svgIcon(action === "pause" ? ICONS.pause : ICONS.play, 24)}
         </button>
       </div>
-      ${s.active ? this._stagesBar(s) : this._recentChips(s)}
+      ${s.active ? this._stagesBar(s) : ""}
+      ${this._recentChips(s)}
       ${this._notice(s)}
     </ha-card>`;
   }
