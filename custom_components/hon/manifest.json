@@ -2,14 +2,16 @@
   "domain": "hon",
   "name": "Haier hOn",
   "codeowners": [
-    "@Andre0512", "@galvani"
+    "@galvani",
+    "@mmalolepszy",
+    "@Andre0512"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/Andre0512/hon/",
+  "documentation": "https://github.com/galvani/hon/",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/galvani/hon/issues",
   "requirements": [
-    "pyhOn==0.17.5"
+    "pyhon-revived==0.19.2"
   ],
-  "version": "0.14.1"
+  "version": "0.19.2.1"
 }

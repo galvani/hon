@@ -7,8 +7,9 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import callback, HomeAssistant
+from homeassistant.core import callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 from .entity import HonEntity
@@ -82,6 +83,28 @@ BINARY_SENSORS: dict[str, tuple[HonBinarySensorEntityDescription, ...]] = {
             name="Acqua Plus",
             translation_key="acqua_plus",
         ),
+        HonBinarySensorEntityDescription(
+            key="energySavingStatus",
+            name="Energy Saving Mode",
+            on_value=1,
+            icon="mdi:leaf",
+            translation_key="energy_saving",
+        ),
+        HonBinarySensorEntityDescription(
+            key="buzzerDisabled",
+            name="Buzzer Disabled",
+            on_value=1,
+            icon="mdi:volume-off",
+            translation_key="buzzer_disabled",
+        ),
+        HonBinarySensorEntityDescription(
+            key="lockStatus",
+            name="Child Lock",
+            device_class=BinarySensorDeviceClass.LOCK,
+            on_value=0,
+            icon="mdi:lock",
+            translation_key="child_lock",
+        ),
     ),
     "TD": (
         HonBinarySensorEntityDescription(
@@ -121,6 +144,52 @@ BINARY_SENSORS: dict[str, tuple[HonBinarySensorEntityDescription, ...]] = {
             on_value=1,
             icon="mdi:power-cycle",
             translation_key="on",
+        ),
+        HonBinarySensorEntityDescription(
+            key="attributes.parameters.preheatStatus",
+            name="Pre-Heat",
+            device_class=BinarySensorDeviceClass.RUNNING,
+            on_value=1,
+            icon="mdi:thermometer-chevron-up",
+            translation_key="pre_heat",
+        ),
+        HonBinarySensorEntityDescription(
+            key="tempStatus",
+            name="Temperature Reached",
+            device_class=BinarySensorDeviceClass.HEAT,
+            on_value=1,
+            icon="mdi:thermometer-check",
+            translation_key="temp_reached",
+        ),
+        HonBinarySensorEntityDescription(
+            key="lockStatus",
+            name="Child Lock",
+            device_class=BinarySensorDeviceClass.LOCK,
+            on_value=0,
+            icon="mdi:lock",
+            translation_key="child_lock",
+        ),
+        HonBinarySensorEntityDescription(
+            key="turnspitStatus",
+            name="Turnspit",
+            on_value=1,
+            icon="mdi:rotate-3d-variant",
+            translation_key="turnspit",
+        ),
+        HonBinarySensorEntityDescription(
+            key="steamStatus",
+            name="Steam Active",
+            on_value=1,
+            icon="mdi:weather-fog",
+            translation_key="steam_active",
+        ),
+        HonBinarySensorEntityDescription(
+            key="descalingRequiredStatus",
+            name="Descaling Required",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            on_value=1,
+            icon="mdi:alert-circle",
+            translation_key="descaling_required",
         ),
     ),
     "IH": (
@@ -193,6 +262,24 @@ BINARY_SENSORS: dict[str, tuple[HonBinarySensorEntityDescription, ...]] = {
             on_value=1,
             translation_key="door_open",
         ),
+        HonBinarySensorEntityDescription(
+            key="addDishStatus",
+            translation_key="add_dish",
+            icon="mdi:silverware-fork-knife",
+            on_value=1,
+        ),
+        HonBinarySensorEntityDescription(
+            key="lastCycleSavingStatus",
+            translation_key="last_cycle_saving",
+            icon="mdi:leaf",
+            on_value=1,
+        ),
+        HonBinarySensorEntityDescription(
+            key="tabStatus",
+            translation_key="detergent_tab",
+            icon="mdi:cube",
+            on_value=1,
+        ),
     ),
     "AC": (
         HonBinarySensorEntityDescription(
@@ -205,6 +292,12 @@ BINARY_SENSORS: dict[str, tuple[HonBinarySensorEntityDescription, ...]] = {
         HonBinarySensorEntityDescription(
             key="ch2oCleaningStatus",
             name="Ch2O Cleaning",
+            on_value=1,
+        ),
+        HonBinarySensorEntityDescription(
+            key="defrostStatus",
+            name="Defrost Status",
+            icon="mdi:snowflake-melt",
             on_value=1,
         ),
     ),
@@ -333,16 +426,15 @@ class HonBinarySensorEntity(HonEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool:
-        return bool(
-            self._device.get(self.entity_description.key, "")
-            == self.entity_description.on_value
-        )
+        attr = self._device.get(self.entity_description.key, None)
+        value = attr.value if hasattr(attr, "value") else attr
+        return value == self.entity_description.on_value
+
 
     @callback
     def _handle_coordinator_update(self, update: bool = True) -> None:
-        self._attr_native_value = (
-            self._device.get(self.entity_description.key, "")
-            == self.entity_description.on_value
-        )
+        attr = self._device.get(self.entity_description.key, None)
+        value = attr.value if hasattr(attr, "value") else attr
+        self._attr_native_value = (value == self.entity_description.on_value)
         if update:
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()

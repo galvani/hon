@@ -8,9 +8,10 @@ from homeassistant.components.number import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTime, UnitOfTemperature
-from homeassistant.core import callback, HomeAssistant
+from homeassistant.core import callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.core import HomeAssistant
 from pyhon.appliance import HonAppliance
 from pyhon.parameter.range import HonParameterRange
 
@@ -109,6 +110,13 @@ NUMBERS: dict[str, tuple[NumberEntityDescription, ...]] = {
             icon="mdi:timelapse",
             native_unit_of_measurement=UnitOfTime.MINUTES,
             translation_key="program_duration",
+        ),
+        HonNumberEntityDescription(
+            key="settings.tempSelEmployedProbe1",
+            name="Probe Target Temperature",
+            icon="mdi:thermometer-plus",
+            native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+            translation_key="probe_target_temperature",
         ),
     ),
     "IH": (
@@ -267,7 +275,7 @@ class HonNumberEntity(HonEntity, NumberEntity):
             self._attr_native_step = setting.step
         self._attr_native_value = self.native_value
         if update:
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
     @property
     def available(self) -> bool:
@@ -323,4 +331,4 @@ class HonConfigNumberEntity(HonEntity, NumberEntity):
             self._attr_native_step = setting.step
         self._attr_native_value = self.native_value
         if update:
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()

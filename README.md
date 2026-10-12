@@ -1,31 +1,34 @@
 # Haier hOn
-[![hacs_badge](https://img.shields.io/badge/hacs-Default-41BDF5.svg)](https://hacs.xyz)
-[![GitHub](https://img.shields.io/github/license/Andre0512/hon?color=red)](https://github.com/Andre0512/hon/blob/main/LICENSE)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Andre0512/hon/python_check.yml?branch=main&label=checks)](https://github.com/Andre0512/hon/actions/workflows/python_check.yml)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-donate-orange.svg)](https://www.buymeacoffee.com/andre0512)  
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Andre0512/hon?color=green)](https://github.com/Andre0512/hon/releases/latest)
-[![GitHub all releases](https://img.shields.io/github/downloads/Andre0512/hon/latest/total?color=blue&label=downloads)](https://tooomm.github.io/github-release-stats/?username=Andre0512&repository=hon)
-[![GitHub all releases](https://img.shields.io/github/downloads/Andre0512/hon/total?color=blue&label=total%20downloads)](https://tooomm.github.io/github-release-stats/?username=Andre0512&repository=hon)
+
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/galvani/hon?color=green)](https://github.com/galvani/hon/releases/latest)
+[![GitHub all releases](https://img.shields.io/github/downloads/galvani/hon/total?color=blue&label=total%20downloads)](https://tooomm.github.io/github-release-stats/?username=galvani&repository=hon)
 
 ---
 
-Home Assistant integration for [Haier's mobile app hOn](https://hon-smarthome.com/) based on [pyhOn](https://github.com/Andre0512/pyhon).
+Home Assistant integration for [Haier's mobile app hOn](https://hon-smarthome.com/).
+
+Maintained by [galvani](https://github.com/galvani). Built on [hOn Revived](https://github.com/mmalolepszy/hon-revived) by [mmalolepszy](https://github.com/mmalolepszy) and its contributors, which continues the original integration by [Andre0512](https://github.com/Andre0512). See [Credits](#credits).
 
 ---
 
+## Installation
+**Method 1:** 
+1. Add https://github.com/galvani/hon with the category "integration" as a custom repository in HACS
+2. Install it in HACS
+3. Restart Home Assistant
 
-[![Supported Languages](https://img.shields.io/badge/Languages-28-royalblue)](https://github.com/Andre0512/hon#supported-languages)
-[![Supported Appliances](https://img.shields.io/badge/Appliances-11-forestgreen)](https://github.com/Andre0512/hon#supported-appliances)
-[![Supported Models](https://img.shields.io/badge/Models-134-yellowgreen)](https://github.com/Andre0512/hon#supported-appliances)
-[![Supported Entities](https://img.shields.io/badge/Entities-320-crimson)](https://github.com/Andre0512/hon#supported-appliances)
+**Method 2:**
+1. Manually copy `hon` folder from [latest release](https://github.com/galvani/hon/releases/latest) to `config/custom_components` folder.
+2. Restart Home Assistant
 
-## Takedown Story
-Haier sent a takedown notice and threatened legal action. The community started a big riot and called for a Haier boycott, the repository was forked over 2000+ times to make the code undeletable. Haier starts a dialog to find a joint solution. Read all about it here:  
-- [Timeline of events](https://github.com/Andre0512/hon/blob/main/takedown_timeline.md)
-- [Takedown FAQs](https://github.com/Andre0512/hon/blob/main/takedown_faq.md)
-- [Main discussion](https://github.com/Andre0512/hon/issues/147)
-- [Summary video](https://www.youtube.com/watch?v=ayG7o74kdbc)
-- [Haier's Statement](https://github.com/Andre0512/hon/issues/147#issuecomment-1923622715)
+## Configuration
+
+**Method 1**: [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=hon)
+
+**Method 2**: Settings > Devices & Services > Add Integration > **Haier hOn**  
+
+_If the integration is not in the list, you need to clear the browser cache._
 
 ## Supported Appliances
 _Click to expand..._
@@ -733,23 +736,6 @@ Support has been confirmed for these **44 models**, but many more will work. Ple
 
 </details>
 
-
-## Installation
-**Method 1:** [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Andre0512&repository=hon&category=integration)
-
-**Method 2:** [HACS](https://hacs.xyz/) > Integrations > Add Integration > **Haier hOn** > Install  
-
-**Method 3:** Manually copy `hon` folder from [latest release](https://github.com/Andre0512/hon/releases/latest) to `config/custom_components` folder.
-
-_Restart Home Assistant_
-
-## Configuration
-
-**Method 1**: [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=hon)
-
-**Method 2**: Settings > Devices & Services > Add Integration > **Haier hOn**  
-_If the integration is not in the list, you need to clear the browser cache._
-
 ## Supported Languages
 Translation of internal names like programs are available for all languages which are official supported by the hOn app:
 * 🇸🇦 Arabic
@@ -782,7 +768,7 @@ Translation of internal names like programs are available for all languages whic
 * 🇺🇦 Ukrainian
 
 ## Compatibility
-Haier offers different apps for different markets. Some appliances are compatible with more than one app. This integration only supports appliances that can be controlled via hOn. Please download the hOn app and check compatibility before you open an issue.   
+Haier offers different apps for different markets. Some appliances are compatible with more than one app. This integration only supports appliances that can be controlled via hOn. Please download the hOn app and check compatibility before you open an issue. 
 The apps on this (incomplete) list have been requested so far:
 
 | App             | Main Market   | Supported                               | Alternative                                                                     |
@@ -796,71 +782,21 @@ The apps on this (incomplete) list have been requested so far:
 | Haier Evo       | Russia        | :x:                                     |                                                                                 |
 
 ## Contribute
-Any kind of contribution is welcome!
+Want to help us to support more appliances? Or add more sensors? Or help with translating? Or beautify some icons or captions? 
+Check out the [project on GitHub](https://github.com/galvani/hon), every contribution is welcome!
 
-
-| Please add your appliances data to our [hon-test-data collection](https://github.com/Andre0512/hon-test-data). <br/>This helps us to develop new features and not to break compatibility in newer versions. |
+| Please add your appliances data to our [hon-test-data collection](https://github.com/mmalolepszy/hon-test-data). <br/>This helps us to develop new features and not to break compatibility in newer versions. |
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
+## Useful Links
+* [GitHub repository](https://github.com/galvani/hon)
+* [pyhOn library](https://github.com/mmalolepszy/pyhOn)
+* [Release notes](https://github.com/galvani/hon/releases)
+* [Issues](https://github.com/galvani/hon/issues)
 
-### Read out device data
-If you want to make a request for adding new appliances or additional attributes and don't want to use the command line, here is how you can read out your device data.
-For every device exists a button under diagnostics which can be used to log all info of your appliance.
-1. Press the button to create a notification
-2. Open home assistant notifications and copy the message (Crtl+A, Ctrl+C)
-### Add appliances or additional attributes
-1. Install [pyhOn](https://github.com/Andre0512/pyhOn)
-   ```commandline
-    $ pip install pyhOn
-    ```
-2. Use the command line tool to read out all appliance data from your account
-    ```commandline
-    $ pyhOn
-    User for hOn account: user.name@example.com
-    Password for hOn account: ********
-    ========== WM - Washing Machine ==========
-    commands:
-      pauseProgram: pauseProgram command
-      resumeProgram: resumeProgram command
-      startProgram: startProgram command
-      stopProgram: stopProgram command
-    data:
-      actualWeight: 0
-      airWashTempLevel: 0
-      airWashTime: 0
-      antiAllergyStatus: 0
-      ...
-    ```
-3. Fork this repository and clone it to your local machine
-4. Add the keys of the attributes you'd like to have as `EntityDescription` into this Repository  
-   _Example: Add pause button_
-    ```python
-    BUTTONS: dict[str, tuple[ButtonEntityDescription, ...]] = {
-        "WM": (                        # WM is the applianceTypeName
-            ButtonEntityDescription(
-                key="pauseProgram",    # key from pyhOn
-                name="Pause Program",  # name in home assistant
-                icon="mdi:pause",      # icon in home assistant
-                ...
-            ),
-        ...
-    ```
-5. Create a [pull request](https://github.com/Andre0512/hon/pulls)
-
-#### Tips and Tricks
-- If you want to have some states humanreadable, have a look at the `translation_key` parameter of the `EntityDescription`.
-- If you need to implement some more logic, create a pull request to the underlying library. There we collect special requirements in the `appliances` directory.
-- Use [pyhOn's translate command](https://github.com/Andre0512/pyhOn#translation) to read out the official translations
-
-## Special Thanks
-- to [@alexandre-leites](https://github.com/alexandre-leites), [@MiguelAngelLV](https://github.com/MiguelAngelLV) and [@drudgebg](https://github.com/drudgebg) for contributing early to this project and adding new integrations.
-- to [gvigroux/hon](https://github.com/gvigroux/hon), [signalize/hon-app-research](https://github.com/signalize/hon-app-research) and [slegars56/hon](https://github.com/slegars56/hon) for inspiring me to do this integration and for doing pioneer work on the hOn api.
-- to everyone who contributed, created an issue, gave this repo a star, and used this integration.
-- to the patience of my girlfriend as I work on this integration.
-
-## Support
-If you find this project helpful and would like to support its development, you can buy me a coffee! ☕
-
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/andre0512)
+## Credits
+* [Andre0512](https://github.com/Andre0512) wrote the original [hon](https://github.com/Andre0512/hon) integration and the [pyhOn](https://github.com/Andre0512/pyhOn) library.
+* [mmalolepszy](https://github.com/mmalolepszy) and the contributors of [hOn Revived](https://github.com/mmalolepszy/hon-revived) and [pyhon-revived](https://github.com/mmalolepszy/pyhOn) kept both alive; most of the current code is theirs. Support them on [Buy Me a Coffee](https://www.buymeacoffee.com/mmalolepszy).
+* [paroque28](https://github.com/paroque28) contributed the TLS fix used by earlier releases of this fork.
 
 Don't forget to star the repository if you found it useful! ⭐

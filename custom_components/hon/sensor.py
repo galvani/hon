@@ -10,8 +10,6 @@ from homeassistant.components.sensor import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     PERCENTAGE,
-    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
-    CONCENTRATION_PARTS_PER_MILLION,
 )
 from homeassistant.const import (
     REVOLUTIONS_PER_MINUTE,
@@ -20,10 +18,13 @@ from homeassistant.const import (
     UnitOfMass,
     UnitOfTime,
     UnitOfTemperature,
+    UnitOfDensity,
+    UnitOfRatio,
 )
-from homeassistant.core import callback, HomeAssistant
+from homeassistant.core import callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.core import HomeAssistant
 
 from . import const
 from .const import DOMAIN
@@ -81,7 +82,7 @@ SENSORS: dict[str, tuple[SensorEntityDescription, ...]] = {
             key="currentElectricityUsed",
             name="Current Electricity Used",
             state_class=SensorStateClass.MEASUREMENT,
-            device_class=SensorDeviceClass.POWER,
+            device_class=SensorDeviceClass.ENERGY,
             native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
             icon="mdi:lightning-bolt",
             translation_key="energy_current",
@@ -90,6 +91,8 @@ SENSORS: dict[str, tuple[SensorEntityDescription, ...]] = {
             key="currentWaterUsed",
             name="Current Water Used",
             state_class=SensorStateClass.MEASUREMENT,
+            device_class=SensorDeviceClass.WATER,
+            native_unit_of_measurement=UnitOfVolume.LITERS,
             icon="mdi:water",
             translation_key="water_current",
         ),
@@ -201,6 +204,29 @@ SENSORS: dict[str, tuple[SensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.ENUM,
             translation_key="stain_type",
             option_list=const.STAIN_TYPES,
+        ),
+        HonSensorEntityDescription(
+            key="remainingMainWashTime",
+            name="Remaining Main Wash Time",
+            icon="mdi:timer-sand",
+            state_class=SensorStateClass.MEASUREMENT,
+            native_unit_of_measurement=UnitOfTime.MINUTES,
+            translation_key="remaining_main_wash_time",
+        ),
+        HonSensorEntityDescription(
+            key="currentWashCycle",
+            name="Current Wash Cycle",
+            icon="mdi:counter",
+            state_class=SensorStateClass.MEASUREMENT,
+            translation_key="current_wash_cycle",
+        ),
+        HonSensorEntityDescription(
+            key="detergentPercent",
+            name="Detergent Level",
+            icon="mdi:cup-water",
+            state_class=SensorStateClass.MEASUREMENT,
+            native_unit_of_measurement=PERCENTAGE,
+            translation_key="detergent_level",
         ),
     ),
     "TD": (
@@ -316,6 +342,29 @@ SENSORS: dict[str, tuple[SensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.ENUM,
             translation_key="programs_ov",
         ),
+        HonSensorEntityDescription(
+            key="tempEmployedProbe1",
+            name="Meat Probe Temperature",
+            icon="mdi:thermometer",
+            state_class=SensorStateClass.MEASUREMENT,
+            device_class=SensorDeviceClass.TEMPERATURE,
+            native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+            translation_key="probe_temperature",
+        ),
+        HonSensorEntityDescription(
+            key="steamTankLevel",
+            name="Steam Tank Level",
+            icon="mdi:water-percent",
+            state_class=SensorStateClass.MEASUREMENT,
+            translation_key="steam_tank_level",
+        ),
+        HonSensorEntityDescription(
+            key="descalingCycleCounter",
+            name="Descaling Cycle Counter",
+            icon="mdi:counter",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            translation_key="descaling_cycle_counter",
+        ),
     ),
     "IH": (
         HonSensorEntityDescription(
@@ -430,6 +479,30 @@ SENSORS: dict[str, tuple[SensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.ENUM,
             translation_key="programs_dw",
         ),
+        HonSensorEntityDescription(
+            key="currentElectricityUsed",
+            translation_key="current_electricity_used",
+            icon="mdi:lightning-bolt",
+            native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+            device_class=SensorDeviceClass.ENERGY,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        HonSensorEntityDescription(
+            key="currentWaterUsed",
+            translation_key="current_water_used",
+            icon="mdi:water",
+            native_unit_of_measurement=UnitOfVolume.LITERS,
+            device_class=SensorDeviceClass.VOLUME,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
+        HonSensorEntityDescription(
+            key="currentCycleTime",
+            translation_key="current_cycle_time",
+            icon="mdi:timer",
+            native_unit_of_measurement=UnitOfTime.MINUTES,
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
+        ),
     ),
     "AC": (
         HonSensorEntityDescription(
@@ -511,6 +584,14 @@ SENSORS: dict[str, tuple[SensorEntityDescription, ...]] = {
             device_class=SensorDeviceClass.ENUM,
             translation_key="mach_modes_ac",
             option_list=const.AC_MACH_MODE,
+        ),
+        HonSensorEntityDescription(
+            key="compressorFrequency",
+            name="Compressor Frequency",
+            icon="mdi:sine-wave",
+            device_class=SensorDeviceClass.FREQUENCY,
+            native_unit_of_measurement="Hz",
+            entity_registry_enabled_default=False,
         ),
     ),
     "REF": (
@@ -726,28 +807,28 @@ SENSORS: dict[str, tuple[SensorEntityDescription, ...]] = {
             name="CO Level",
             state_class=SensorStateClass.MEASUREMENT,
             device_class=SensorDeviceClass.CO,
-            native_unit_of_measurement=CONCENTRATION_PARTS_PER_MILLION,
+            native_unit_of_measurement=UnitOfRatio.PARTS_PER_MILLION,
         ),
         HonSensorEntityDescription(
             key="pm10ValueIndoor",
             name="PM 10",
             state_class=SensorStateClass.MEASUREMENT,
             device_class=SensorDeviceClass.PM10,
-            native_unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+            native_unit_of_measurement=UnitOfDensity.MICROGRAMS_PER_CUBIC_METER,
         ),
         HonSensorEntityDescription(
             key="pm2p5ValueIndoor",
             name="PM 2.5",
             state_class=SensorStateClass.MEASUREMENT,
             device_class=SensorDeviceClass.PM25,
-            native_unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+            native_unit_of_measurement=UnitOfDensity.MICROGRAMS_PER_CUBIC_METER,
         ),
         HonSensorEntityDescription(
             key="vocValueIndoor",
             name="VOC",
             state_class=SensorStateClass.MEASUREMENT,
             device_class=SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
-            native_unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+            native_unit_of_measurement=UnitOfDensity.MICROGRAMS_PER_CUBIC_METER,
             translation_key="voc",
         ),
         HonSensorEntityDescription(
@@ -833,7 +914,6 @@ class HonSensorEntity(HonEntity, SensorEntity):
 
     @callback
     def _handle_coordinator_update(self, update: bool = True) -> None:
-        """Handle updated data from the coordinator."""
         value = self._device.get(self.entity_description.key, "")
         if self.entity_description.key == "programName":
             if not (options := self._device.settings.get("startProgram.program")):
@@ -847,7 +927,7 @@ class HonSensorEntity(HonEntity, SensorEntity):
         else:
             self._attr_native_value = value
         if update:
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()
 
 
 class HonConfigSensorEntity(HonEntity, SensorEntity):
@@ -855,7 +935,6 @@ class HonConfigSensorEntity(HonEntity, SensorEntity):
 
     @callback
     def _handle_coordinator_update(self, update: bool = True) -> None:
-        """Handle updated data from the coordinator."""
         sensor = self._device.settings.get(self.entity_description.key, None)
         value: float | str
         if self.entity_description.state_class is not None:
@@ -876,4 +955,4 @@ class HonConfigSensorEntity(HonEntity, SensorEntity):
             value = get_readable(self.entity_description, value)
         self._attr_native_value = value
         if update:
-            self.async_write_ha_state()
+            self.schedule_update_ha_state()

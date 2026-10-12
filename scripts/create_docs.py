@@ -120,4 +120,3 @@ if __name__ == "__main__":
     models = get_models()
     text = generate_text(entities, models)
     update_readme(text, entities, models)
-    update_readme(text, entities, models, "info.md")

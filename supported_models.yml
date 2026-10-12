@@ -1,6 +1,6 @@
-# This file helps to manage the model lists for README.md and info.md
+# This file helps to manage the model lists for README.md
 # Execute scripts/create_docs.py to refresh
-# Add your device here or use this https://forms.gle/bTSD8qFotdZFytbf8
+# Add your device here:
 
 wm:
   haier:
