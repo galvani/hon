@@ -12,6 +12,7 @@ from pyhon import Hon
 
 from .const import DOMAIN, PLATFORMS, MOBILE_ID, CONF_REFRESH_TOKEN
 from .frontend import async_register_cards
+from .recent import async_setup_recent
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,7 +57,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hon.subscribe_updates(_notify)
 
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.unique_id] = {"hon": hon, "coordinator": coordinator}
+    recent = await async_setup_recent(hass, entry.entry_id, hon.appliances, coordinator)
+    hass.data[DOMAIN][entry.unique_id] = {
+        "hon": hon,
+        "coordinator": coordinator,
+        "recent": recent,
+    }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     await async_register_cards(hass)

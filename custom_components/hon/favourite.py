@@ -14,7 +14,7 @@ FAVOURITE_DESCRIPTION = SelectEntityDescription(
 )
 
 
-def _program_name(category: str) -> str:
+def program_name(category: str) -> str:
     return category.split(".")[-1].lower() if "PROGRAM" in category else category
 
 
@@ -26,7 +26,7 @@ def favourite_names(device: HonAppliance) -> list[str]:
     return sorted(
         name
         for name, program in command.categories.items()
-        if "favourite" in program.parameters and name != _program_name(program.category)
+        if "favourite" in program.parameters and name != program_name(program.category)
     )
 
 

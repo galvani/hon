@@ -37,7 +37,11 @@ The integration ships a dashboard card for washing machines, washer-dryers and t
 ```yaml
 type: custom:hon-washer-card
 device_id: <your appliance's device id>
+layout: compact   # or full (default)
+recent: 2         # how many recently used programs to offer
 ```
+
+The compact layout is one row with a start/pause button and your two most recent programs; the full layout adds the program list, favourites, temperature and spin.
 
 Add it from the dashboard's card picker ("hOn washing machine"); it fills in the first hOn washer it finds. Starting from Home Assistant needs remote control enabled on the machine itself.
 
