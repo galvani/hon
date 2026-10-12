@@ -25,3 +25,18 @@ jobs:
         run: uv run mypy -p custom_components.hon
       - name: Pytest
         run: uv run pytest -q
+
+  minimum-home-assistant:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.14"
+          enable-cache: true
+      - name: Install the oldest Home Assistant in hacs.json
+        run: |
+          uv sync --group dev
+          uv pip install "pytest-homeassistant-custom-component==0.13.348"
+      - name: Pytest on Home Assistant 2026.7
+        run: uv run --no-sync pytest -q

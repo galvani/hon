@@ -110,6 +110,8 @@ uv run mypy -p custom_components.hon
 uv run pytest
 ```
 
+CI also runs the tests on the oldest Home Assistant `hacs.json` allows (job `minimum-home-assistant`, pinned through the `pytest-homeassistant-custom-component` release for that HA). Raising the minimum means changing both together; a test helper that needs a newer HA API breaks that job, so prefer registry calls that exist in both versions.
+
 `uvx pre-commit install` runs the formatters and linters on each commit.
 
 The tests start a real Home Assistant instance in-process (`pytest-homeassistant-custom-component`) and load appliances from the fixture dumps through pyhon's `TestAPI`. Nothing reaches the network, and no hOn account is needed.

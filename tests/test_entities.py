@@ -88,13 +88,14 @@ async def _setup(hass: HomeAssistant, entry: MockConfigEntry) -> None:
 def _entities_by_appliance(
     hass: HomeAssistant, entry: MockConfigEntry, fake_hon: FakeHon
 ) -> dict[str, list[er.RegistryEntry]]:
-    devices = dr.async_get(hass)
+    devices = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
     entities = er.async_get(hass)
     result: dict[str, list[er.RegistryEntry]] = {}
     for appliance in fake_hon.appliances:
         key = f"{appliance.appliance_type}{appliance.appliance_model_id}"
-        device = devices.async_get_device_by_identifier(
-            ("hon", appliance.unique_id), entry.entry_id
+        device = next(
+            (d for d in devices if ("hon", appliance.unique_id) in d.identifiers),
+            None,
         )
         result[key] = er.async_entries_for_device(entities, device.id) if device else []
     return result
