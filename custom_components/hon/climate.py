@@ -188,11 +188,15 @@ class HonACClimateEntity(HonEntity, ClimateEntity):
         if "settings.machMode" in self._device.settings:
             current_mach = self._device.get("machMode")
             if current_mach is not None:
-                self._device.settings["settings.machMode"].value = str(int(current_mach))
+                self._device.settings["settings.machMode"].value = str(
+                    int(current_mach)
+                )
         if "settings.onOffStatus" in self._device.settings:
             current_onoff = self._device.get("onOffStatus")
             if current_onoff is not None:
-                self._device.settings["settings.onOffStatus"].value = str(int(current_onoff))
+                self._device.settings["settings.onOffStatus"].value = str(
+                    int(current_onoff)
+                )
 
         self._device.settings["settings.tempSel"].value = str(int(temperature))
         await self._device.commands["settings"].send()
@@ -211,12 +215,13 @@ class HonACClimateEntity(HonEntity, ClimateEntity):
 
         mode = HON_HVAC_MODE[mach]
 
-        if mode == HVACMode.AUTO and getattr(self, "_attr_hvac_mode", None) not in (
-            None,
-            HVACMode.OFF,
-            HVACMode.AUTO,
+        current: HVACMode | None = getattr(self, "_attr_hvac_mode", None)
+        if (
+            mode == HVACMode.AUTO
+            and current is not None
+            and current not in (HVACMode.OFF, HVACMode.AUTO)
         ):
-            return self._attr_hvac_mode
+            return current
 
         return mode
 
@@ -279,11 +284,15 @@ class HonACClimateEntity(HonEntity, ClimateEntity):
         if "settings.machMode" in self._device.settings:
             current_mach = self._device.get("machMode")
             if current_mach is not None:
-                self._device.settings["settings.machMode"].value = str(int(current_mach))
+                self._device.settings["settings.machMode"].value = str(
+                    int(current_mach)
+                )
         if "settings.onOffStatus" in self._device.settings:
             current_onoff = self._device.get("onOffStatus")
             if current_onoff is not None:
-                self._device.settings["settings.onOffStatus"].value = str(int(current_onoff))
+                self._device.settings["settings.onOffStatus"].value = str(
+                    int(current_onoff)
+                )
 
         fan_modes: dict[str, str] = {}
         for mode in reversed(self._device.settings["settings.windSpeed"].values):
@@ -310,11 +319,15 @@ class HonACClimateEntity(HonEntity, ClimateEntity):
         if "settings.machMode" in self._device.settings:
             current_mach = self._device.get("machMode")
             if current_mach is not None:
-                self._device.settings["settings.machMode"].value = str(int(current_mach))
+                self._device.settings["settings.machMode"].value = str(
+                    int(current_mach)
+                )
         if "settings.onOffStatus" in self._device.settings:
             current_onoff = self._device.get("onOffStatus")
             if current_onoff is not None:
-                self._device.settings["settings.onOffStatus"].value = str(int(current_onoff))
+                self._device.settings["settings.onOffStatus"].value = str(
+                    int(current_onoff)
+                )
 
         horizontal = self._device.settings["settings.windDirectionHorizontal"]
         vertical = self._device.settings["settings.windDirectionVertical"]

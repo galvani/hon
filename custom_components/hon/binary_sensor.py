@@ -428,13 +428,12 @@ class HonBinarySensorEntity(HonEntity, BinarySensorEntity):
     def is_on(self) -> bool:
         attr = self._device.get(self.entity_description.key, None)
         value = attr.value if hasattr(attr, "value") else attr
-        return value == self.entity_description.on_value
-
+        return bool(value == self.entity_description.on_value)
 
     @callback
     def _handle_coordinator_update(self, update: bool = True) -> None:
         attr = self._device.get(self.entity_description.key, None)
         value = attr.value if hasattr(attr, "value") else attr
-        self._attr_native_value = (value == self.entity_description.on_value)
+        self._attr_native_value = value == self.entity_description.on_value
         if update:
             self.schedule_update_ha_state()
