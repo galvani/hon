@@ -18,7 +18,7 @@ Expose appliances registered in Haier's hOn app (Haier, Candy, Hoover) as Home A
 
 - Cloud only: no local API exists, so the integration needs the internet and a working hOn account.
 - Stability of entity identity: an entity's `unique_id` is the appliance id plus the description key, and must not change across releases.
-- Minimum Home Assistant version: the one in `hacs.json`.
+- Minimum Home Assistant version: the one in `hacs.json` (2026.7.0, the first release with `UnitOfDensity` and `UnitOfRatio`).
 
 ## Not in scope
 
