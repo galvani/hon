@@ -431,11 +431,22 @@ const STYLE = `<style>
   }
 </style>`;
 
-customElements.define("hon-washer-card", HonWasherCard);
-window.customCards = window.customCards || [];
-window.customCards.push({
-  type: "hon-washer-card",
-  name: "hOn washing machine",
-  description: "Program, recent programs, favourites, progress and start/pause for an hOn washing machine, washer-dryer or dryer.",
-  preview: true,
-});
+const register = () => {
+  if (customElements.get("hon-washer-card")) return;
+  customElements.define("hon-washer-card", HonWasherCard);
+  window.customCards = window.customCards || [];
+  window.customCards.push({
+    type: "hon-washer-card",
+    name: "hOn washing machine",
+    description: "Program, recent programs, favourites, progress and start/pause for an hOn washing machine, washer-dryer or dryer.",
+    preview: true,
+  });
+};
+
+// Home Assistant swaps in a scoped custom-element registry while its app loads;
+// a card defined before that is invisible to the dashboard.
+if (document.querySelector("home-assistant")) {
+  customElements.whenDefined("home-assistant").then(register);
+} else {
+  register();
+}
