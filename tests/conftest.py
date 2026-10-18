@@ -28,10 +28,24 @@ class FixtureAPI(TestAPI):
         return favourites
 
 
+class FakeAuth:
+    def __init__(self) -> None:
+        self.refresh_token = "refresh"
+        self.cognito_token = "cognito"
+        self.error: Exception | None = None
+        self.logins = 0
+
+    async def authenticate(self) -> None:
+        self.logins += 1
+        if self.error is not None:
+            raise self.error
+        self.cognito_token = "cognito"
+
+
 class FakeHon:
     def __init__(self, appliances: list[HonAppliance]) -> None:
         self.appliances = appliances
-        self.api = SimpleNamespace(auth=SimpleNamespace(refresh_token="refresh"))
+        self.api = SimpleNamespace(auth=FakeAuth())
         self.notify_function: Callable[[Any], None] | None = None
 
     def subscribe_updates(self, notify_function: Callable[[Any], None]) -> None:

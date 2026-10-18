@@ -1,17 +1,22 @@
-from typing import Optional, Any
+from collections.abc import Coroutine
+from typing import Optional, Any, TypeVar
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from pyhon.appliance import HonAppliance
+from pyhon.exceptions import HonAuthenticationError
 
 from .const import DOMAIN
 from .typedefs import HonEntityDescription
+
+_T = TypeVar("_T")
 
 
 class HonEntity(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]]]):
@@ -29,6 +34,7 @@ class HonEntity(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]]]):
         super().__init__(self.coordinator)
         self._hon = hass.data[DOMAIN][entry.unique_id]["hon"]
         self._hass = hass
+        self._entry = entry
         self._device: HonAppliance = device
 
         if description is not None:
@@ -49,6 +55,15 @@ class HonEntity(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]]]):
             hw_version=f"{self._device.appliance_type}{self._device.model_id}",
             serial_number=self._device.get("serialNumber", ""),
         )
+
+    async def async_request_call(self, coro: Coroutine[Any, Any, _T]) -> _T:
+        try:
+            return await super().async_request_call(coro)
+        except HonAuthenticationError as err:
+            self._entry.async_start_reauth(self._hass)
+            raise HomeAssistantError(
+                translation_domain=DOMAIN, translation_key="auth_failed"
+            ) from err
 
     @callback
     def _handle_coordinator_update(self, update: bool = True) -> None:

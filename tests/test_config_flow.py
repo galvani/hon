@@ -1,11 +1,23 @@
 from __future__ import annotations
 
+from collections.abc import Generator
+from unittest.mock import AsyncMock, patch
+
+import pytest
 from homeassistant.config_entries import SOURCE_USER
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.hon.const import DOMAIN
+
+
+@pytest.fixture(autouse=True)
+def check_login() -> Generator[AsyncMock]:
+    with patch(
+        "custom_components.hon.config_flow.async_check_login", return_value=""
+    ) as mock:
+        yield mock
 
 
 async def test_user_flow_creates_entry(hass: HomeAssistant) -> None:
@@ -34,3 +46,20 @@ async def test_duplicate_account_aborts(hass: HomeAssistant) -> None:
             {CONF_EMAIL: "user@example.com", CONF_PASSWORD: "secret"},
         )
         assert result["type"] is expected
+
+
+@pytest.mark.parametrize("error", ["invalid_auth", "cannot_connect"])
+async def test_user_flow_shows_login_error(
+    hass: HomeAssistant, check_login: AsyncMock, error: str
+) -> None:
+    check_login.return_value = error
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_EMAIL: "user@example.com", CONF_PASSWORD: "wrong"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": error}
+    assert hass.config_entries.async_entries(DOMAIN) == []

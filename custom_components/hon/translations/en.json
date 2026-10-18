@@ -2354,7 +2354,27 @@
                     "email": "Email",
                     "password": "Password"
                 }
+            },
+            "reauth_confirm": {
+                "title": "Sign in to hOn again",
+                "description": "hOn no longer accepts the password stored for {email}. Enter the password you use in the hOn app.",
+                "data": {
+                    "password": "Password"
+                }
             }
+        },
+        "error": {
+            "invalid_auth": "hOn rejected the email or password.",
+            "cannot_connect": "Could not reach hOn. Try again later."
+        },
+        "abort": {
+            "already_configured": "This hOn account is already set up.",
+            "reauth_successful": "Signed in again. The integration is reloading."
+        }
+    },
+    "exceptions": {
+        "auth_failed": {
+            "message": "hOn rejected the stored login. Sign in again from the notification in Settings."
         }
     }
 }

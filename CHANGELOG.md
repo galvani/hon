@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.19.2.2
+
+This release also includes everything in 0.19.2.1 below, which had no release of its own. Read its *Before you update* section if you are coming from 0.14.
+
+### New
+
+- **Sign in again without removing the integration.** When hOn stops accepting your login, for example after you change your password in the hOn app, Home Assistant shows a "re-authentication required" notification. Enter your password there and the integration reloads with your devices, entities and history intact.
+- **Login check during setup.** Adding the integration checks your email and password with hOn and tells you right away if they are wrong or hOn cannot be reached.
+
+### Fixed
+
+- A switch, button or other control used while hOn rejects the login now shows a message telling you to sign in again.
+- When hOn cannot be reached while Home Assistant starts, the integration retries on its own.
+
 ## 0.19.2.1
 
 This release moves the integration onto [hOn Revived](https://github.com/mmalolepszy/hon-revived) 0.19.2 by [mmalolepszy](https://github.com/mmalolepszy) and its contributors, so you get everything they have built since the original integration stopped: more oven, dishwasher, washing machine and air conditioner entities, translations, and the current [pyhon-revived](https://pypi.org/project/pyhon-revived/) library.

@@ -2,6 +2,13 @@
 
 Decisions and their reasons, newest first.
 
+## 2026-10-18 — Sign in again when hOn rejects the login
+
+- **Problem:** on Jan's install the hOn login stopped working on 2026-10-13, and the integration was silently dead for five days; the only trace was a `pyhon.connection.auth` 401 (`AUTH-INV-PARAM`, "Invalid username or password") when a switch was toggled. The integration had no reauth flow and the config flow never checked the password.
+- **Cause of the silence:** pyhon's `HonAuth.refresh()` swallows a failed `authenticate()`, and `authenticate()` clears the tokens first, so after a failed background re-login the tokens stay empty and nothing raises until the next command.
+- **Decision:** `ConfigEntryAuthFailed` at setup, a `reauth_confirm` step that only stores a password hOn accepts, `HonEntity.async_request_call` turning `HonAuthenticationError` into reauth + a translated `HomeAssistantError`, and a 5-minute check that re-logs in when the tokens are empty and starts reauth only when hOn rejects the login. One override in the entity base covers all 27 command call sites without touching hon-revived's platform modules.
+- **Not covered:** a 5xx from hOn's login endpoint raises the same `HonAuthenticationError` as a wrong password in pyhon, so it also asks the user to sign in again.
+
 ## 2026-10-12 — Favourites and the washer card
 
 - **Decision:** expose hOn app favourites as their own `select` ("Favourite program") instead of only as entries hidden among 175 programs. pyhon already loads them; it flags the base program too because it shallow-copies it, so favourites are identified by key ≠ program name.
