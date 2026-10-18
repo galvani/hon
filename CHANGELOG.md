@@ -2,8 +2,6 @@
 
 ## 0.19.2.2
 
-This release also includes everything in 0.19.2.1 below, which had no release of its own. Read its *Before you update* section if you are coming from 0.14.
-
 ### New
 
 - **Sign in again without removing the integration.** When hOn stops accepting your login, for example after you change your password in the hOn app, Home Assistant shows a "re-authentication required" notification. Enter your password there and the integration reloads with your devices, entities and history intact.
