@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.2.3
+
+### Fixed
+
+- **Appliances no longer stay "offline" after they come back.** When Home Assistant missed the message that an appliance had reconnected, it kept showing it as disconnected, and its start switch and other controls stayed unavailable until Home Assistant restarted, even though the appliance worked in the hOn app. The integration now re-reads every appliance from hOn every 5 minutes, so the connection status and the controls come back on their own.
+
 ## 0.19.2.2
 
 ### New

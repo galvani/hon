@@ -28,7 +28,7 @@ hOn cloud ──REST──► pyhon (pyhon-revived) ──► HonAppliance objec
      └──MQTT push──► Hon.notify() ──► coordinator ──► every entity refreshes
 ```
 
-- **`__init__.py`** — `async_setup_entry` logs in with `pyhon.Hon`, stores `{"hon": hon, "coordinator": coordinator}` in `hass.data[DOMAIN][entry.unique_id]`, and forwards to the platforms in `const.PLATFORMS`. The coordinator does not poll: pyhon's MQTT client calls the function given to `hon.subscribe_updates`, from the MQTT library's own thread, so that function hands the update to the event loop with `call_soon_threadsafe`.
+- **`__init__.py`** — `async_setup_entry` logs in with `pyhon.Hon`, stores `{"hon": hon, "coordinator": coordinator}` in `hass.data[DOMAIN][entry.unique_id]`, and forwards to the platforms in `const.PLATFORMS`. The coordinator is fed by push, plus one REST re-read of every appliance on the 5-minute auth tick (`_resync`), which also re-derives `appliance.connection` from `lastConnEvent` — pyhon sets `connection` only from MQTT connected/disconnected events and never updates `lastConnEvent` from them. pyhon's MQTT client calls the function given to `hon.subscribe_updates`, from the MQTT library's own thread, so that function hands the update to the event loop with `call_soon_threadsafe`.
 - **`entity.py`** — `HonEntity`, the base of every entity: device info, `unique_id`, and coordinator wiring.
 - **One module per platform** (`sensor.py`, `switch.py`, `select.py`, `number.py`, `binary_sensor.py`, `button.py`, `climate.py`, `fan.py`, `light.py`, `lock.py`). Each one has:
   - a dict of **entity descriptions keyed by appliance type** (`SENSORS["WM"]`, `SWITCHES["AC"]`, …) — this table *is* the feature list;

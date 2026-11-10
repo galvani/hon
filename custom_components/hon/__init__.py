@@ -69,22 +69,38 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hon.subscribe_updates(_notify)
 
     # pyhon clears its tokens before a login, so empty tokens mean its last re-login failed.
-    async def _check_auth(_now: datetime) -> None:
-        if hon.api.auth.cognito_token or any(
-            entry.async_get_active_flows(hass, {SOURCE_REAUTH})
-        ):
-            return
+    async def _session_alive() -> bool:
+        if hon.api.auth.cognito_token:
+            return True
+        if any(entry.async_get_active_flows(hass, {SOURCE_REAUTH})):
+            return False
         try:
             await hon.api.auth.authenticate()
         except HonAuthenticationError:
             _LOGGER.warning("hOn rejected the stored credentials")
             entry.async_start_reauth(hass)
+            return False
         except (ClientError, TimeoutError) as err:
             _LOGGER.debug("hOn login retry failed: %s", err)
+            return False
+        return True
 
-    entry.async_on_unload(
-        async_track_time_interval(hass, _check_auth, AUTH_CHECK_INTERVAL)
-    )
+    # MQTT push is the only other source of state, and a missed "connected" event
+    # leaves an appliance offline in Home Assistant, its controls unavailable, for good.
+    async def _resync(_now: datetime) -> None:
+        if not await _session_alive():
+            return
+        for appliance in hon.appliances:
+            try:
+                await appliance.update(force=True)
+            except (HonAuthenticationError, ClientError, TimeoutError) as err:
+                _LOGGER.debug("hOn refresh of %s failed: %s", appliance.nick_name, err)
+                continue
+            category = appliance.attributes.get("lastConnEvent", {}).get("category")
+            appliance.connection = category != "DISCONNECTED"
+        coordinator.async_set_updated_data({})
+
+    entry.async_on_unload(async_track_time_interval(hass, _resync, AUTH_CHECK_INTERVAL))
 
     hass.data.setdefault(DOMAIN, {})
     recent = await async_setup_recent(hass, entry.entry_id, hon.appliances, coordinator)

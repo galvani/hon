@@ -2,6 +2,13 @@
 
 Decisions and their reasons, newest first.
 
+## 2026-11-10 — Re-read appliances over REST every 5 minutes
+
+- **Problem:** on Jan's washer-dryer the start switch was `unavailable` from 2026-11-07 and the "Remote Control" sensor `off` from 2026-10-18, while settings commands sent from Home Assistant still reached the machine. Starting a wash from HA was impossible.
+- **Cause:** pyhon sets `appliance.connection` only from MQTT `connected`/`disconnected` events, and never updates `attributes.lastConnEvent` from them — that attribute is read once at startup over REST. The integration never polled. One missed `connected` event (MQTT down when the machine came back) therefore left the appliance offline in HA until a restart; the "Remote Control" binary sensor, which is really `lastConnEvent.category == CONNECTED`, showed the state at HA's last start forever.
+- **Decision:** on the existing 5-minute auth tick, once the session is alive, `appliance.update(force=True)` for every appliance, re-derive `connection` with pyhon's own startup rule (`category != "DISCONNECTED"`) and push one coordinator update. Kept in `__init__.py`; hon-revived's platform modules untouched. No entity keys changed.
+- **Not changed:** the sensor's misleading name "Remote Control" — renaming its key would orphan every user's entity.
+
 ## 2026-10-18 — Sign in again when hOn rejects the login
 
 - **Problem:** on Jan's install the hOn login stopped working on 2026-10-13, and the integration was silently dead for five days; the only trace was a `pyhon.connection.auth` 401 (`AUTH-INV-PARAM`, "Invalid username or password") when a switch was toggled. The integration had no reauth flow and the config flow never checked the password.

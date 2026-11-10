@@ -8,6 +8,7 @@ from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 from pyhon.exceptions import HonAuthenticationError
 from pytest_homeassistant_custom_component.common import (
@@ -149,3 +150,24 @@ async def test_reauth_stores_the_new_password_and_reloads(
     assert config_entry.data[CONF_EMAIL] == "user@example.com"
     assert config_entry.data[CONF_PASSWORD] == "new-secret"
     assert config_entry.state is ConfigEntryState.LOADED
+
+
+async def test_background_check_recovers_a_missed_connected_event(
+    hass: HomeAssistant, mock_hon: FakeHon, config_entry: MockConfigEntry
+) -> None:
+    await _setup(hass, config_entry)
+    washer = next(a for a in mock_hon.appliances if a.appliance_type == "WD")
+    start = er.async_get(hass).async_get_entity_id(
+        "switch", DOMAIN, f"{washer.unique_id}active"
+    )
+    assert start is not None
+    washer.connection = False
+    mock_hon.notify_function({})
+    await hass.async_block_till_done()
+    await hass.async_block_till_done()
+    assert hass.states.get(start).state == STATE_UNAVAILABLE
+
+    async_fire_time_changed(hass, dt_util.utcnow() + AUTH_CHECK_INTERVAL)
+    await hass.async_block_till_done()
+    assert washer.connection is True
+    assert hass.states.get(start).state != STATE_UNAVAILABLE
