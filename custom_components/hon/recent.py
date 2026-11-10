@@ -6,7 +6,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from pyhon.appliance import HonAppliance
 
-from .favourite import program_name
+from .favourite import program_name, running_program
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class RecentPrograms:
             running = self._is_running(device)
             started = running and not self._running.get(device.unique_id, False)
             self._running[device.unique_id] = running
-            if started and (program := self._running_program(device)):
+            if started and (program := running_program(device)):
                 self._remember(device.unique_id, program)
 
     def _remember(self, unique_id: str, program: str) -> None:
@@ -56,24 +56,6 @@ class RecentPrograms:
 
     def _save(self) -> None:
         self._store.async_delay_save(lambda: self._programs, 5)
-
-    @staticmethod
-    def _running_program(device: HonAppliance) -> str | None:
-        try:
-            code = int(device.get("prCode", 0))
-        except TypeError, ValueError:
-            return None
-        if (command := device.commands.get("startProgram")) is None:
-            return None
-        for name, program in command.categories.items():
-            parameter = program.parameters.get("prCode")
-            if (
-                parameter is not None
-                and str(parameter.value) == str(code)
-                and name == program_name(program.category)
-            ):
-                return name
-        return None
 
     @staticmethod
     def _is_running(device: HonAppliance) -> bool:

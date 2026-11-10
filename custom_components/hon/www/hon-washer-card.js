@@ -36,7 +36,7 @@ const TEXT = {
     wash: "Wash", rinse: "Rinse", spin: "Spin", dry: "Dry",
     left: "min left", ends: "Ends at", idle: "Ready", program: "Program",
     favourites: "Favourites", recent: "Recent", start: "Start", stop: "Stop", pause: "Pause",
-    resume: "Resume", remoteOff: "Remote start is off on the machine. Press its remote button to control it from here.",
+    resume: "Resume", starting: "Starting…", remoteOff: "Remote start is off on the machine. Press its remote button to control it from here.",
     noDevice: "Choose a washing machine, washer-dryer or dryer from the hOn integration in the card settings.",
     temperature: "Temperature", spinSpeed: "Spin",
     options: "Options", extraRinse: "Extra rinse", noExtraRinse: "Normal", plusRinse: "rinse",
@@ -46,7 +46,7 @@ const TEXT = {
     wash: "Praní", rinse: "Máchání", spin: "Ždímání", dry: "Sušení",
     left: "min zbývá", ends: "Konec v", idle: "Připraveno", program: "Program",
     favourites: "Oblíbené", recent: "Naposledy", start: "Spustit", stop: "Zastavit", pause: "Pozastavit",
-    resume: "Pokračovat", remoteOff: "Dálkové ovládání je na pračce vypnuté. Zapněte ho tlačítkem na pračce.",
+    resume: "Pokračovat", starting: "Spouští se…", remoteOff: "Dálkové ovládání je na pračce vypnuté. Zapněte ho tlačítkem na pračce.",
     noDevice: "V nastavení karty vyberte pračku, pračku se sušičkou nebo sušičku z integrace hOn.",
     temperature: "Teplota", spinSpeed: "Odstředění",
     options: "Volby", extraRinse: "Máchání navíc", noExtraRinse: "Běžné", plusRinse: "máchání",
@@ -165,13 +165,17 @@ class HonWasherCard extends HTMLElement {
     const paused = status === "pause";
     const active = running || paused || status === "scheduled";
     const remaining = Number(e.remaining?.state);
-    const hasTime = active && Number.isFinite(remaining) && remaining > 0;
+    // After a start these sensors hold the previous run's values until the machine's first push.
+    const fresh = (stateObj) =>
+      !stateObj?.last_changed || !e.status?.last_changed || new Date(stateObj.last_changed) >= new Date(e.status.last_changed);
+    const starting = running && !fresh(e.remaining);
+    const hasTime = active && !starting && Number.isFinite(remaining) && remaining > 0;
     const stage = active ? Object.keys(STAGES).find((s) => STAGES[s].includes(e.phase?.state)) : undefined;
     const stages = Object.keys(STAGES).filter((s) => s !== "dry" || e.dryLevel);
     const options = e.program?.attributes.options || [];
     const favourites = e.favourite?.attributes.options || [];
     return {
-      e, running, paused, active, remaining, hasTime, stage, stages, favourites,
+      e, running, paused, active, starting, remaining, hasTime, stage, stages, favourites,
       reached: stage ? stages.indexOf(stage) : -1,
       ends: hasTime
         ? new Date(Date.now() + remaining * 60000).toLocaleTimeString(this._hass.locale?.language, { hour: "2-digit", minute: "2-digit" })
@@ -179,7 +183,9 @@ class HonWasherCard extends HTMLElement {
       subtitle: active
         ? [this._format(e.status), this._usable(e.phase) ? this._format(e.phase) : ""].filter(Boolean).join(", ")
         : this._usable(e.status) ? this._format(e.status) : this._t("idle"),
-      programLabel: active && this._usable(e.runningProgram) ? this._format(e.runningProgram) : this._format(e.program),
+      programLabel: active && this._usable(e.runningProgram) && e.runningProgram.state !== "No Program" && fresh(e.runningProgram)
+        ? this._format(e.runningProgram)
+        : this._format(e.program),
       programs: options.filter((o) => !o.startsWith("iot_") && !favourites.includes(o)),
       recent: this._recent.filter((o) => options.includes(o)).slice(0, this._config.recent),
       controllable: this._usable(e.start),
@@ -274,7 +280,7 @@ class HonWasherCard extends HTMLElement {
         <div class="readout">
           ${s.hasTime
             ? `<span class="minutes">${s.remaining}</span><span class="unit">${escape(this._t("left"))}</span>`
-            : `<span class="unit idle">${escape(s.active ? this._format(e.status) : this._t("idle"))}</span>`}
+            : `<span class="unit idle">${escape(s.starting ? this._t("starting") : s.active ? this._format(e.status) : this._t("idle"))}</span>`}
         </div>
         ${e.doorLock?.state === "on" ? `<span class="lock" title="${escape(this._format(e.doorLock))}">${svgIcon(ICONS.lock, 16)}</span>` : ""}
       </div>

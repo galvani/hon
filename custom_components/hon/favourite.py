@@ -18,6 +18,27 @@ def program_name(category: str) -> str:
     return category.split(".")[-1].lower() if "PROGRAM" in category else category
 
 
+# pyhon's own programName skips every iot_ program and every favourite.
+def running_program(device: HonAppliance) -> str | None:
+    try:
+        code = int(device.get("prCode", 0))
+    except TypeError, ValueError:
+        return None
+    if not code:
+        return None
+    if (command := device.commands.get("startProgram")) is None:
+        return None
+    for name, program in command.categories.items():
+        parameter = program.parameters.get("prCode")
+        if (
+            parameter is not None
+            and str(parameter.value) == str(code)
+            and name == program_name(program.category)
+        ):
+            return name
+    return None
+
+
 def favourite_names(device: HonAppliance) -> list[str]:
     # pyhon shallow-copies a favourite's base program, so the base program carries
     # the "favourite" flag too; only the favourite's key differs from its category.

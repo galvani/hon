@@ -19,6 +19,7 @@
   <section class="theme dark"><h1>Running (Czech, dark)</h1><div id="running"></div></section>
   <section class="theme light"><h1>Ready with favourites (English, light)</h1><div id="idle"></div></section>
   <section class="theme light"><h1>Remote control off on the machine</h1><div id="remote"></div></section>
+  <section class="theme dark"><h1>Just started, no update from the machine yet</h1><div id="starting"></div></section>
   <section class="theme dark"><h1>Compact, running</h1><div id="compact-running"></div></section>
   <section class="theme light"><h1>Compact, ready with the last two programs</h1><div id="compact-idle"></div></section>
   <section class="theme light"><h1>Compact, remote control off</h1><div id="compact-remote"></div></section>
@@ -49,7 +50,7 @@
   };
   const UNITS = { "select.washer_temperature": " °C", "select.washer_spin": " rpm" };
 
-  function makeHass({ language, status, phase, remaining, program, start = "off", pause = "off", lock = "off", options = [] }) {
+  function makeHass({ language, status, phase, remaining, program, start = "off", pause = "off", lock = "off", options = [], stale = false }) {
     const states = {};
     const entities = {};
     const add = (entity_id, translation_key, state, attributes = {}) => {
@@ -59,7 +60,12 @@
     add("sensor.washer_status", "washing_modes", status);
     add("sensor.washer_phase", "program_phases_wm", phase);
     add("sensor.washer_remaining", "remaining_time", String(remaining));
-    add("sensor.washer_running_program", "programs_wm", "eco_40_60_new_energy_label");
+    add("sensor.washer_running_program", "programs_wm", stale ? "resistant_cotton" : "eco_40_60_new_energy_label");
+    if (stale) {
+      states["sensor.washer_status"].last_changed = "2026-11-10T11:42:57Z";
+      states["sensor.washer_remaining"].last_changed = "2026-11-10T10:51:58Z";
+      states["sensor.washer_running_program"].last_changed = "2026-11-10T10:51:58Z";
+    }
     add("select.washer_program", "programs_wm", program, {
       options: ["Barevné ložní prádlo", "Dětské", "Vše v jednom 59'", "baby", "cottons", "eco_40_60_new_energy_label", "iot_checkup", "mix", "quick_14", "synthetic_and_coloured", "wool"],
     });
@@ -102,6 +108,7 @@
   mount("running", makeHass({ language: "cs", status: "running", phase: "washing", remaining: 86, program: "Vše v jednom 59'", start: "on", lock: "on" }));
   mount("idle", makeHass({ language: "en", status: "ready", phase: "ready", remaining: 0, program: "Dětské", options: ["extraWater", "rinse1"] }));
   mount("remote", makeHass({ language: "en", status: "ready", phase: "ready", remaining: 0, program: "cottons", start: "unavailable", pause: "unavailable" }));
+  mount("starting", makeHass({ language: "en", status: "running", phase: "washing", remaining: 170, program: "Vše v jednom 59'", start: "on", lock: "on", stale: true }));
   mount("compact-running", makeHass({ language: "cs", status: "running", phase: "rinse", remaining: 24, program: "Vše v jednom 59'", start: "on", lock: "on" }), "compact");
   mount("compact-idle", makeHass({ language: "cs", status: "ready", phase: "ready", remaining: 0, program: "eco_40_60_new_energy_label" }), "compact");
   mount("compact-remote", makeHass({ language: "en", status: "ready", phase: "ready", remaining: 0, program: "cottons", start: "unavailable", pause: "unavailable" }), "compact");

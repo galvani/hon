@@ -2,6 +2,13 @@
 
 Decisions and their reasons, newest first.
 
+## 2026-11-10 — Name every running program; no stale values after a start
+
+- **Problem:** Jan's washer ran "Rapid 59' + Steam" started from the hOn app, and the Program sensor said "No Program"; right after a start from the card it showed the previous run's "Resistant Cotton, 170 min" for about three minutes.
+- **Cause (names):** pyhon's `HonParameterProgram.ids`, which turns `prCode` into `programName`, skips every `iot_` program and every program flagged favourite — and the hOn app starts `iot_` programs. `recent.py` already resolved `prCode` through the program categories correctly.
+- **Decision:** that lookup moves to `favourite.running_program` and the Program sensor falls back to it when pyhon says "No Program"; pyhon and hon-revived's modules are untouched. No program table to maintain: the names come from the washer's own program list.
+- **Cause (stale):** after a start, `remaining_time` and the program sensor keep the last run's values until the machine's first status push. The card now treats a sensor whose `last_changed` predates the status change to running as stale and shows "Starting…" and the selected program.
+
 ## 2026-11-10 — Wash options on the card
 
 - **Problem:** the card had no way to set pre-wash, extra water or extra rinses, so a favourite's options could not be seen or changed from it (Jan).

@@ -10,6 +10,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.hon.const import DOMAIN
+
 from .conftest import FakeHon
 
 EXPECTED_COUNTS: dict[str, dict[str, int]] = {
@@ -228,3 +230,25 @@ async def test_empty_value_with_state_class_reports_zero(
     await _notify_from_thread(hass, mock_hon)
 
     assert hass.states.get(entity_id).state == "0"  # type: ignore[union-attr]
+
+
+async def test_program_sensor_names_a_program_pyhon_cannot(
+    hass: HomeAssistant, mock_hon: FakeHon, config_entry: MockConfigEntry
+) -> None:
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    washer = next(a for a in mock_hon.appliances if a.appliance_type == "WM")
+    sensor = er.async_get(hass).async_get_entity_id(
+        "sensor", DOMAIN, f"{washer.unique_id}programName"
+    )
+    assert sensor is not None
+    assert hass.states.get(sensor).state == "No Program"
+
+    washer.attributes["parameters"]["prCode"].update(
+        {"parName": "prCode", "parNewVal": "224"}
+    )
+    mock_hon.notify_function({})
+    await hass.async_block_till_done()
+    await hass.async_block_till_done()
+    assert hass.states.get(sensor).state == "iot_wash_denim_jeans"

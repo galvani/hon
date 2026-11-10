@@ -29,6 +29,7 @@ from homeassistant.core import HomeAssistant
 from . import const
 from .const import DOMAIN
 from .entity import HonEntity
+from .favourite import running_program
 from .util import unique_entities, get_readable
 
 _LOGGER = logging.getLogger(__name__)
@@ -919,6 +920,10 @@ class HonSensorEntity(HonEntity, SensorEntity):
             if not (options := self._device.settings.get("startProgram.program")):
                 raise ValueError
             self._attr_options = options.values + ["No Program"]
+            if value == "No Program" and (running := running_program(self._device)):
+                value = running
+                if running not in self._attr_options:
+                    self._attr_options.append(running)
         elif self.entity_description.option_list is not None:
             self._attr_options = list(self.entity_description.option_list.values())
             value = str(get_readable(self.entity_description, value))

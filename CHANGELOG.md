@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.19.2.5
+
+### Fixed
+
+- **The Program sensor names the program that is running**, including programs started from the hOn app and your favourites. It used to show "No Program" for them.
+- **The washing machine card no longer shows the previous wash right after a start.** Until the machine sends its first update, the card shows "Starting…" and the program you picked, instead of the last run's time left and program.
+
 ## 0.19.2.4
 
 ### New
