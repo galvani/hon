@@ -6,11 +6,23 @@
 
 ---
 
-Home Assistant integration for [Haier's mobile app hOn](https://hon-smarthome.com/).
+Control and monitor your **Haier, Candy and Hoover** appliances from Home Assistant through the hOn cloud: washing machines, washer-dryers, tumble dryers, dishwashers, ovens, hobs, hoods, fridges, wine cellars, air conditioners and air purifiers. In 28 languages.
+
+![hOn washing machine card](https://raw.githubusercontent.com/galvani/hon/main/assets/card-full.png)
+
+## What you get
+
+- **A washing machine card**, installed with the integration: time left, wash stage, program and favourite pickers, temperature, spin, and start, pause and stop. A compact one-row layout for small dashboards. See [Washing machine card](#washing-machine-card).
+- **Your hOn app favourites** as their own program picker, and the **programs you ran recently**, wherever you started them.
+- **Sensors, switches and settings** for each appliance type — every entity is listed under [Supported Appliances](#supported-appliances).
+- **Sign in again without reinstalling**: when hOn stops accepting your login, Home Assistant asks for the password and keeps your devices and history.
+- **Status that heals itself**: if Home Assistant misses an update from the hOn cloud, the integration catches up within 5 minutes.
+
+## What's new
+
+Every release is described in the [changelog](https://github.com/galvani/hon/blob/main/CHANGELOG.md); HACS shows the same notes when it offers an update.
 
 Maintained by [galvani](https://github.com/galvani). Built on [hOn Revived](https://github.com/mmalolepszy/hon-revived) by [mmalolepszy](https://github.com/mmalolepszy) and its contributors, which continues the original integration by [Andre0512](https://github.com/Andre0512). See [Credits](#credits).
-
----
 
 ## Installation
 **Method 1:**
@@ -42,6 +54,8 @@ recent: 2         # how many recently used programs to offer
 ```
 
 The compact layout is one row with a start/pause button and your two most recent programs; the full layout adds the program list, favourites, temperature and spin.
+
+![Compact layout](https://raw.githubusercontent.com/galvani/hon/main/assets/card-compact.png)
 
 Add it from the dashboard's card picker ("hOn washing machine"); it fills in the first hOn washer it finds. Starting from Home Assistant needs remote control enabled on the machine itself.
 
