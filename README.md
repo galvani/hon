@@ -12,7 +12,7 @@ Control and monitor your **Haier, Candy and Hoover** appliances from Home Assist
 
 ## What you get
 
-- **A washing machine card**, installed with the integration: time left, wash stage, program and favourite pickers, temperature, spin, and start, pause and stop. A compact one-row layout for small dashboards. See [Washing machine card](#washing-machine-card).
+- **A washing machine card**, installed with the integration: time left, wash stage, program and favourite pickers, temperature, spin, drying, wash options (pre-wash, extra water, extra rinses and more), and start, pause and stop. A compact one-row layout for small dashboards. See [Washing machine card](#washing-machine-card).
 - **Your hOn app favourites** as their own program picker, and the **programs you ran recently**, wherever you started them.
 - **Sensors, switches and settings** for each appliance type — every entity is listed under [Supported Appliances](#supported-appliances).
 - **Sign in again without reinstalling**: when hOn stops accepting your login, Home Assistant asks for the password and keeps your devices and history.
@@ -44,7 +44,7 @@ _If the integration is not in the list, you need to clear the browser cache._
 
 ## Washing machine card
 
-The integration ships a dashboard card for washing machines, washer-dryers and tumble dryers. It shows the time left and the wash stage, lets you pick a program or one of the favourites you saved in the hOn app, set temperature and spin, and start, pause or stop the machine.
+The integration ships a dashboard card for washing machines, washer-dryers and tumble dryers. It shows the time left and the wash stage, lets you pick a program or one of the favourites you saved in the hOn app, set temperature, spin and drying, switch wash options such as pre-wash, extra water and extra rinses, and start, pause or stop the machine. Only the options the selected program allows are shown.
 
 ```yaml
 type: custom:hon-washer-card

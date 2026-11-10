@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.19.2.4
+
+### New
+
+- **Wash options on the washing machine card.** Pre-wash, extra water, hygiene, quiet night and anti-crease are now toggles on the card, and extra rinses (+1, +2, +3) are one choice row. The card shows only the options the selected program allows, so picking a favourite shows that favourite's options, ready to change before you press Start.
+
 ## 0.19.2.3
 
 ### Fixed

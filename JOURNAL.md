@@ -2,6 +2,11 @@
 
 Decisions and their reasons, newest first.
 
+## 2026-11-10 — Wash options on the card
+
+- **Problem:** the card had no way to set pre-wash, extra water or extra rinses, so a favourite's options could not be seen or changed from it (Jan).
+- **Decision:** extra rinses (`extra_rinse_1/2/3`) are one segmented choice, because the three switches exclude each other; the card turns the chosen one on and the others off. Pre-wash, extra water (`acqua_plus`), hygiene, good night and anti-crease are wrapping pill toggles. Only `usable` entities are shown — the integration marks an option unavailable when the selected program does not allow it, which is what makes a favourite show its own options.
+
 ## 2026-11-10 — Re-read appliances over REST every 5 minutes
 
 - **Problem:** on Jan's washer-dryer the start switch was `unavailable` from 2026-11-07 and the "Remote Control" sensor `off` from 2026-10-18, while settings commands sent from Home Assistant still reached the machine. Starting a wash from HA was impossible.

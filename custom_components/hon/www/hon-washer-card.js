@@ -11,7 +11,18 @@ const ROLES = {
   start: ["switch", ["washing_machine", "washer_dryer", "tumble_dryer"]],
   pause: ["switch", ["pause"]],
   doorLock: ["binary_sensor", ["door_lock"]],
+  prewash: ["switch", ["prewash"]],
+  extraWater: ["switch", ["acqua_plus"]],
+  hygiene: ["switch", ["hygiene"]],
+  goodNight: ["switch", ["good_night"]],
+  antiCrease: ["switch", ["anti_crease"]],
+  rinse1: ["switch", ["extra_rinse_1"]],
+  rinse2: ["switch", ["extra_rinse_2"]],
+  rinse3: ["switch", ["extra_rinse_3"]],
 };
+
+const TOGGLES = ["prewash", "extraWater", "hygiene", "goodNight", "antiCrease"];
+const RINSES = ["rinse1", "rinse2", "rinse3"];
 
 const STAGES = {
   wash: ["weighting", "heating", "washing", "steam", "tumbling", "refresh"],
@@ -28,6 +39,8 @@ const TEXT = {
     resume: "Resume", remoteOff: "Remote start is off on the machine. Press its remote button to control it from here.",
     noDevice: "Choose a washing machine, washer-dryer or dryer from the hOn integration in the card settings.",
     temperature: "Temperature", spinSpeed: "Spin",
+    options: "Options", extraRinse: "Extra rinse", noExtraRinse: "Normal", plusRinse: "rinse",
+    prewash: "Pre-wash", extraWater: "Extra water", hygiene: "Hygiene", goodNight: "Quiet night", antiCrease: "Anti-crease",
   },
   cs: {
     wash: "Praní", rinse: "Máchání", spin: "Ždímání", dry: "Sušení",
@@ -36,6 +49,8 @@ const TEXT = {
     resume: "Pokračovat", remoteOff: "Dálkové ovládání je na pračce vypnuté. Zapněte ho tlačítkem na pračce.",
     noDevice: "V nastavení karty vyberte pračku, pračku se sušičkou nebo sušičku z integrace hOn.",
     temperature: "Teplota", spinSpeed: "Odstředění",
+    options: "Volby", extraRinse: "Máchání navíc", noExtraRinse: "Běžné", plusRinse: "máchání",
+    prewash: "Předpírka", extraWater: "Více vody", hygiene: "Hygiena", goodNight: "Tichý noční", antiCrease: "Proti zmačkání",
   },
 };
 
@@ -47,6 +62,7 @@ const ICONS = {
   history: "M13 3a9 9 0 0 0-9 9H1l3.9 3.9.1.1L9 12H6a7 7 0 1 1 2.05 4.95l-1.42 1.42A9 9 0 1 0 13 3Zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12Z",
   lock: "M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm6-9h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2ZM9 6a3 3 0 0 1 6 0v2H9V6Z",
   chevron: "M7 10l5 5 5-5z",
+  check: "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
 };
 
 const svgIcon = (path, size = 20) =>
@@ -214,6 +230,26 @@ class HonWasherCard extends HTMLElement {
     </div>`;
   }
 
+  _options(s) {
+    const e = s.e;
+    const rinses = RINSES.filter((r) => this._usable(e[r]));
+    const toggles = TOGGLES.filter((t) => this._usable(e[t]));
+    if (!rinses.length && !toggles.length) return "";
+    const chosen = RINSES.findIndex((r) => e[r]?.state === "on") + 1;
+    const rinseRow = rinses.length
+      ? `<div class="choice" role="radiogroup" aria-label="${escape(this._t("extraRinse"))}">
+          <button class="seg" role="radio" aria-checked="${chosen === 0}" data-rinse="0">${escape(this._t("noExtraRinse"))}</button>
+          ${rinses.map((r) => `<button class="seg" role="radio" aria-checked="${chosen === RINSES.indexOf(r) + 1}" data-rinse="${RINSES.indexOf(r) + 1}">+${RINSES.indexOf(r) + 1} ${escape(this._t("plusRinse"))}</button>`).join("")}
+        </div>`
+      : "";
+    const pills = toggles.length
+      ? `<div class="options" role="group" aria-label="${escape(this._t("options"))}">
+          ${toggles.map((t) => `<button class="opt" aria-pressed="${e[t].state === "on"}" data-toggle="${escape(e[t].entity_id)}">${e[t].state === "on" ? svgIcon(ICONS.check, 16) : ""}${escape(this._t(t))}</button>`).join("")}
+        </div>`
+      : "";
+    return rinseRow + pills;
+  }
+
   _actions(s) {
     if (s.active) {
       return `<button class="primary" data-action="${s.paused ? "resume" : "pause"}" ${this._usable(s.e.pause) ? "" : "disabled"}>${svgIcon(s.paused ? ICONS.play : ICONS.pause)}${escape(this._t(s.paused ? "resume" : "pause"))}</button>
@@ -260,7 +296,7 @@ class HonWasherCard extends HTMLElement {
         <div class="favourites" aria-label="${escape(this._t("favourites"))}">
           ${s.favourites.map((o) => `<button class="fav" aria-pressed="${o === e.program?.state}" data-select="${escape(e.favourite.entity_id)}" data-option="${escape(o)}" ${s.active ? "disabled" : ""}>${svgIcon(ICONS.star, 14)}${escape(o)}</button>`).join("")}
         </div>` : ""}
-      ${!s.active ? `<div class="settings">${this._chips(e.temperature, this._t("temperature"))}${this._chips(e.spin, this._t("spinSpeed"))}${this._chips(e.dryLevel, this._t("dry"))}</div>` : ""}
+      ${!s.active ? `<div class="settings">${this._chips(e.temperature, this._t("temperature"))}${this._chips(e.spin, this._t("spinSpeed"))}${this._chips(e.dryLevel, this._t("dry"))}${this._options(s)}</div>` : ""}
       <div class="actions">${this._actions(s)}</div>
       ${this._notice(s)}
     </ha-card>`;
@@ -308,6 +344,22 @@ class HonWasherCard extends HTMLElement {
       el.addEventListener("click", () =>
         this._call("select", "select_option", this._hass.states[el.dataset.select], { option: el.dataset.option }),
       ),
+    );
+    this.shadowRoot.querySelectorAll("[data-toggle]").forEach((el) =>
+      el.addEventListener("click", () => {
+        const stateObj = this._hass.states[el.dataset.toggle];
+        this._call("switch", stateObj?.state === "on" ? "turn_off" : "turn_on", stateObj);
+      }),
+    );
+    this.shadowRoot.querySelectorAll("[data-rinse]").forEach((el) =>
+      el.addEventListener("click", () => {
+        const want = Number(el.dataset.rinse);
+        RINSES.forEach((r, i) => {
+          const on = s.e[r]?.state === "on";
+          if (i + 1 === want && !on) this._call("switch", "turn_on", s.e[r]);
+          if (i + 1 !== want && on) this._call("switch", "turn_off", s.e[r]);
+        });
+      }),
     );
     this.shadowRoot.querySelector("[data-program]")?.addEventListener("change", (ev) =>
       this._call("select", "select_option", s.e.program, { option: ev.target.value }),
@@ -397,6 +449,11 @@ const STYLE = `<style>
   .fav[aria-pressed="true"] { background: color-mix(in srgb, var(--hon-action) 12%, transparent); border-color: var(--hon-action); }
 
   .settings { display: grid; gap: 8px; }
+  .options { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 2px; }
+  .opt { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--hon-line); background: none; color: var(--hon-ink); font: inherit; font-size: 0.88rem; cursor: pointer; }
+  .opt[aria-pressed="true"] { padding-left: 10px; background: color-mix(in srgb, var(--hon-action) 12%, transparent); border-color: var(--hon-action); }
+  .opt svg { color: var(--hon-action); }
+  .opt:focus-visible, .seg:focus-visible, .fav:focus-visible, .pick:focus-visible { outline: 2px solid var(--hon-action); outline-offset: 2px; }
   .settings:empty { display: none; }
   .choice { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); padding: 3px; border-radius: 12px; background: var(--hon-well); }
   .seg { min-height: 36px; padding: 0 4px; border: 0; border-radius: 9px; background: none; color: var(--hon-muted); font: inherit; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }

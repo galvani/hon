@@ -49,7 +49,7 @@
   };
   const UNITS = { "select.washer_temperature": " °C", "select.washer_spin": " rpm" };
 
-  function makeHass({ language, status, phase, remaining, program, start = "off", pause = "off", lock = "off" }) {
+  function makeHass({ language, status, phase, remaining, program, start = "off", pause = "off", lock = "off", options = [] }) {
     const states = {};
     const entities = {};
     const add = (entity_id, translation_key, state, attributes = {}) => {
@@ -71,6 +71,14 @@
     add("switch.washer_start", "washing_machine", start);
     add("switch.washer_pause", "pause", pause);
     add("binary_sensor.washer_door_lock", "door_lock", lock);
+    add("switch.washer_prewash", "prewash", options.includes("prewash") ? "on" : "off");
+    add("switch.washer_acquaplus", "acqua_plus", options.includes("extraWater") ? "on" : "off");
+    add("switch.washer_hygiene", "hygiene", "off");
+    add("switch.washer_good_night", "good_night", "unavailable");
+    add("switch.washer_anticrease", "anti_crease", "off");
+    add("switch.washer_rinse_1", "extra_rinse_1", options.includes("rinse1") ? "on" : "off");
+    add("switch.washer_rinse_2", "extra_rinse_2", "off");
+    add("switch.washer_rinse_3", "extra_rinse_3", "off");
     return {
       states, entities,
       devices: { washer: { name: "Pračka" } },
@@ -92,7 +100,7 @@
     document.getElementById(id).append(card);
   };
   mount("running", makeHass({ language: "cs", status: "running", phase: "washing", remaining: 86, program: "Vše v jednom 59'", start: "on", lock: "on" }));
-  mount("idle", makeHass({ language: "en", status: "ready", phase: "ready", remaining: 0, program: "Dětské" }));
+  mount("idle", makeHass({ language: "en", status: "ready", phase: "ready", remaining: 0, program: "Dětské", options: ["extraWater", "rinse1"] }));
   mount("remote", makeHass({ language: "en", status: "ready", phase: "ready", remaining: 0, program: "cottons", start: "unavailable", pause: "unavailable" }));
   mount("compact-running", makeHass({ language: "cs", status: "running", phase: "rinse", remaining: 24, program: "Vše v jednom 59'", start: "on", lock: "on" }), "compact");
   mount("compact-idle", makeHass({ language: "cs", status: "ready", phase: "ready", remaining: 0, program: "eco_40_60_new_energy_label" }), "compact");
